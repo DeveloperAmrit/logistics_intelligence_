@@ -1,0 +1,4 @@
+# Only needed when running against the Docker stack (make up / make demo-kafka).
+# Install with: make install-kafka
+confluent-kafka>=2.3
+psycopg[binary]>=3.1

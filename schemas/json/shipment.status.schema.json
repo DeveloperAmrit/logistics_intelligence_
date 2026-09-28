@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "shipment.status_changed payload",
+  "type": "object",
+  "required": ["new_status"],
+  "properties": {
+    "old_status": {"type": ["string", "null"]},
+    "new_status": {"type": "string",
+                   "enum": ["CREATED", "INBOUND", "PICKED", "PACKED",
+                            "DISPATCHED", "IN_TRANSIT", "DELIVERED"]},
+    "carrier_id": {"type": "string"},
+    "temperature_class": {"type": "string"},
+    "promised_delivery_time": {"type": "string", "format": "date-time"}
+  }
+}

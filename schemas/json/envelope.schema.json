@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Event envelope",
+  "type": "object",
+  "required": ["event_id", "event_type", "event_time", "ingest_time", "source", "schema_version"],
+  "properties": {
+    "event_id":       {"type": "string", "description": "unique per event; the deduplication key"},
+    "event_type":     {"type": "string"},
+    "event_time":     {"type": "string", "format": "date-time", "description": "when it happened"},
+    "ingest_time":    {"type": "string", "format": "date-time", "description": "when we first saw it"},
+    "source":         {"type": "string"},
+    "schema_version": {"type": "string"},
+    "vehicle_id":     {"type": ["string", "null"]},
+    "sensor_id":      {"type": ["string", "null"]},
+    "shipment_id":    {"type": ["string", "null"]},
+    "warehouse_id":   {"type": ["string", "null"]},
+    "route_id":       {"type": ["string", "null"]},
+    "payload":        {"type": "object"}
+  }
+}

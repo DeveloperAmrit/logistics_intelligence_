@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "warehouse.* payload",
+  "type": "object",
+  "required": ["scan_type"],
+  "properties": {
+    "scan_type": {"type": "string",
+                  "enum": ["inbound", "picked", "packed", "dispatched", "delivered"]}
+  }
+}

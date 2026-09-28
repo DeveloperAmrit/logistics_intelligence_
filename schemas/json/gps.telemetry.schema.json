@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "gps.telemetry payload",
+  "type": "object",
+  "required": ["latitude", "longitude", "speed_kph"],
+  "properties": {
+    "latitude":  {"type": "number", "minimum": -90,  "maximum": 90},
+    "longitude": {"type": "number", "minimum": -180, "maximum": 180},
+    "speed_kph": {"type": "number", "minimum": 0}
+  }
+}

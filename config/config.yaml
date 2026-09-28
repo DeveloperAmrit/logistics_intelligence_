@@ -1,0 +1,64 @@
+# Single source of truth for runtime behaviour.
+# Nothing in src/ may hard-code an endpoint or a threshold.
+
+simulation:
+  seed: 42
+  network: jodhpur_demo
+  duration_seconds: 3600        # simulated seconds per run
+  step_seconds: 1
+  vehicles: 40
+  sensors: 24
+  shipments: 120
+  gps_interval_seconds: 5       # poll active vehicles every N simulated seconds
+  sensor_interval_seconds: 30
+  speed_kph_range: [18, 62]
+
+kafka:
+  bootstrap_servers: localhost:9092
+  topics:
+    gps: raw.gps
+    sensor: raw.sensor
+    warehouse: raw.warehouse
+    shipment: raw.shipment
+    cold_chain_alert: alerts.cold_chain
+    route_deviation_alert: alerts.route_deviation
+    dlq: quarantine.dlq
+  partitions: 6
+  retention_days: 7
+
+streaming:
+  watermark_seconds: 60         # bounded out-of-orderness
+  allowed_lateness_seconds: 300
+  dedup_window_seconds: 3600
+
+cold_chain:
+  min_celsius: 2.0
+  max_celsius: 8.0
+  consecutive_readings: 2       # alert on 2 consecutive breaches ...
+  sustained_seconds: 900        # ... or 15 minutes of sustained breach
+
+route_deviation:
+  corridor_metres: 250          # accepted distance either side of the planned route
+  persistence_seconds: 60       # must stay outside the corridor this long
+
+validation:
+  latitude_range: [-90.0, 90.0]
+  longitude_range: [-180.0, 180.0]
+  temperature_range: [-30.0, 50.0]
+  humidity_range: [0.0, 100.0]
+
+storage:
+  root: data/lake                # bronze / silver / gold live here
+  format: parquet
+  bronze_partition: event_date
+
+postgres:
+  host: localhost
+  port: 5432
+  database: logistics
+  user: logistics
+  password: logistics
+
+api:
+  host: 127.0.0.1
+  port: 8000

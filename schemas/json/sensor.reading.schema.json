@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "sensor.reading payload",
+  "type": "object",
+  "required": ["temperature_c", "humidity_pct"],
+  "properties": {
+    "temperature_c":     {"type": "number", "minimum": -30, "maximum": 50},
+    "humidity_pct":      {"type": "number", "minimum": 0,   "maximum": 100},
+    "shock_g":           {"type": "number", "minimum": 0},
+    "battery_pct":       {"type": "number", "minimum": 0, "maximum": 100},
+    "temperature_class": {"type": "string", "enum": ["COLD_2_8", "AMBIENT"]}
+  }
+}

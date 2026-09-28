@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logistics Intelligence Platform</title>
+<style>
+  :root { --ink:#111113; --soft:#5b5b61; --mute:#8e8e94; --line:#d9d9dd; --tint:#f4f4f5; --acc:#c4341c; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#fff; color:var(--ink);
+         font:14px/1.5 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width:1100px; margin:0 auto; padding:32px 20px 64px; }
+  .kicker { font-family:ui-monospace, "Courier New", monospace; font-size:11px;
+            letter-spacing:1.6px; color:var(--mute); }
+  h1 { font-size:28px; margin:8px 0 4px; letter-spacing:-0.2px; }
+  .lede { color:var(--soft); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; }
+  .card { border:1px solid var(--line); border-radius:8px; padding:14px 16px; }
+  .card.tint { background:var(--tint); }
+  .big { font-size:26px; font-weight:700; }
+  .lab { font-size:12px; color:var(--soft); }
+  .sub { font-family:ui-monospace,"Courier New",monospace; font-size:10px; color:var(--mute);
+         letter-spacing:0.6px; margin-top:4px; }
+  h2 { font-size:16px; margin:32px 0 10px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; font-family:ui-monospace,"Courier New",monospace; font-size:10px;
+       letter-spacing:1px; color:var(--mute); font-weight:400; padding:0 8px 6px 0;
+       border-bottom:1px solid var(--ink); }
+  td { padding:7px 8px 7px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+  .mono { font-family:ui-monospace,"Courier New",monospace; font-size:12px; }
+  .acc { color:var(--acc); font-weight:700; }
+  .empty { color:var(--mute); padding:14px 0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#f2f2f3; --soft:#b3b3ba; --mute:#8e8e94; --line:#2c2c31; --tint:#191a1d; }
+    body { background:#111113; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">LIVE OPERATIONS · GROUP 16</div>
+  <h1>Logistics Intelligence Platform</h1>
+  <p class="lede" id="lede">Loading the latest run…</p>
+
+  <div class="grid" id="tiles"></div>
+
+  <h2>Active alerts</h2>
+  <div id="alerts"><p class="empty">Loading…</p></div>
+
+  <h2>Carrier performance</h2>
+  <div id="carriers"><p class="empty">Loading…</p></div>
+
+  <h2>Data quality — quarantined records</h2>
+  <div id="dq"><p class="empty">Loading…</p></div>
+</div>
+<script>
+const api = p => fetch(p).then(r => r.ok ? r.json() : Promise.reject(r.status));
+const tile = (big, lab, sub, acc) =>
+  `<div class="card${acc ? " tint" : ""}"><div class="big${acc ? " acc" : ""}">${big}</div>
+   <div class="lab">${lab}</div><div class="sub">${sub}</div></div>`;
+
+async function load() {
+  try {
+    const run = await api('/api/v1/run');
+    const s = run.stats;
+    document.getElementById('lede').textContent =
+      `Scenario ${run.scenario}, seed ${run.seed}, ${run.published.toLocaleString()} events published in ${run.seconds}s.`;
+    document.getElementById('tiles').innerHTML = [
+      tile(s.valid.toLocaleString(), 'valid events processed', 'AFTER VALIDATION AND DEDUP'),
+      tile(s.cold_chain_alerts + s.route_deviation_alerts, 'alerts raised',
+           `${s.suppressed_spikes} NOISE SPIKES SUPPRESSED`, true),
+      tile(s.quarantined.toLocaleString(), 'records quarantined', 'REASON AND PAYLOAD KEPT'),
+      tile(s.duplicates.toLocaleString(), 'duplicates suppressed', 'DEDUPLICATED ON EVENT_ID'),
+      tile(s.late_side_output.toLocaleString(), 'events past the lateness window', 'ROUTED TO SIDE OUTPUT'),
+      tile(run.replay_match ? 'match' : 'MISMATCH', 'replay from offset zero', 'RECORD COUNTS COMPARED')
+    ].join('');
+
+    const a = await api('/api/v1/alerts');
+    document.getElementById('alerts').innerHTML = a.count === 0
+      ? '<p class="empty">No alerts in this run.</p>'
+      : `<table><tr><th>TYPE</th><th>SHIPMENT</th><th>RULE</th><th>STARTED</th><th>EXPLANATION</th></tr>` +
+        a.alerts.map(x => `<tr><td>${x.alert_type}</td><td class="mono">${x.shipment_id || ''}</td>
+          <td class="mono">${x.rule_id}</td><td class="mono">${(x.start_event_time||'').replace('T',' ').replace('Z','')}</td>
+          <td>${x.explanation}</td></tr>`).join('') + '</table>';
+
+    const c = await api('/api/v1/analytics/carriers');
+    document.getElementById('carriers').innerHTML =
+      `<table><tr><th>CARRIER</th><th>SHIPMENTS</th><th>OTIF %</th><th>MEDIAN DELAY (MIN)</th></tr>` +
+      c.carriers.map(x => `<tr><td class="mono">${x.carrier_id}</td><td>${x.shipments}</td>
+        <td>${x.otif_pct ?? '-'}</td><td>${x.median_delay_min ?? '-'}</td></tr>`).join('') + '</table>';
+
+    const q = await api('/api/v1/quarantine');
+    document.getElementById('dq').innerHTML = q.count === 0
+      ? '<p class="empty">Nothing quarantined in this run.</p>'
+      : `<table><tr><th>EVENT</th><th>TYPE</th><th>REASON</th><th>OBSERVED</th></tr>` +
+        q.records.map(x => `<tr><td class="mono">${x.event_id.slice(0,8)}…</td>
+          <td>${x.event_type}</td><td class="mono">${x.reason_codes.join(', ')}</td>
+          <td class="mono">${x.reasons.map(r => r.field + '=' + r.observed).join(', ')}</td></tr>`).join('') +
+        '</table>';
+  } catch (err) {
+    document.getElementById('lede').textContent =
+      'No run found yet. Run "make demo" and refresh this page.';
+  }
+}
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+
+scenario            COLD_CHAIN_EXCURSION   seed 42   6.6s
+----------------------------------------------------------------
+published           40206
+consumed            40206
+valid               39794
+quarantined         412  {'GPS_LATITUDE_RANGE': 359, 'SENSOR_HUMIDITY_RANGE': 53}
+duplicates dropped  0
+on time             39794
+late, tolerated     0
+late, side output   0
+cold-chain alerts   7  (spikes suppressed: 5)
+deviation alerts    0
+replay count match  True
+bronze rows         39794
+silver              {'silver_gps': 32929, 'silver_sensor': 5569, 'silver_warehouse': 588, 'silver_shipment_status': 708}
+gold                {'dim_shipment': 120, 'dim_date': 1, 'fact_delivery_performance': 120, 'fact_cold_chain_excursion': 7, 'fact_warehouse_dwell': 120}
+OTIF                77.8%  median delay -11.8 min  p95 10.2 min
+excursions in gold  7  peak 11.39 C
+parquet on disk     {'bronze_bytes': 1582852, 'silver_bytes': 1114040, 'gold_bytes': 10052}
+
+scenario                   valid   quar  dupes late.tol late.side   cc   rd
+----------------------------------------------------------------------------
+NORMAL_DELIVERY            39793    413      0        0         0    0    0
+GPS_DROPOUT                39793    413      0      166         0    0    0
+DUPLICATE_EVENT            39809    415   1229        0         0    0    0
+LATE_EVENT                 39809    397      0       43      1557    0    0
+ROUTE_DEVIATION            39793    413      0        0         0    0    3
+WAREHOUSE_DWELL_DELAY      36558    372      0        0         0    0    0
+COLD_CHAIN_EXCURSION       39794    412      0        0         0    7    0
