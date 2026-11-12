@@ -52,6 +52,19 @@
 
   <h2>Data quality — quarantined records</h2>
   <div id="dq"><p class="empty">Loading…</p></div>
+
+  <div class="kicker" style="margin-top:44px">HISTORY · MODELS</div>
+  <p class="lede" id="hist-lede">Loading the history run…</p>
+  <div class="grid" id="ml-tiles"></div>
+
+  <h2>Delay risk at dispatch — latest shipments</h2>
+  <div id="risk"><p class="empty">Loading…</p></div>
+
+  <h2>Reefer trips the 8 °C rule cannot see</h2>
+  <div id="trips"><p class="empty">Loading…</p></div>
+
+  <h2>Tomorrow's orders by warehouse</h2>
+  <div id="forecast"><p class="empty">Loading…</p></div>
 </div>
 <script>
 const api = p => fetch(p).then(r => r.ok ? r.json() : Promise.reject(r.status));
@@ -102,7 +115,54 @@ async function load() {
       'No run found yet. Run "make demo" and refresh this page.';
   }
 }
+
+async function loadModels() {
+  const none = 'Run "make history" and "make ml", then refresh.';
+  try {
+    const h = await api('/api/v1/history/summary');
+    const m = await api('/api/v1/ml/report');
+    const d = h.kpis.delivery;
+    document.getElementById('hist-lede').textContent =
+      `${h.published.toLocaleString()} events over ${h.gold.dim_date} days, ${d.shipments.toLocaleString()} shipments, OTIF ${d.otif_pct}%.`;
+    const by = name => m.delay.models.find(x => x.model === name);
+    const gbt = by('gbt'), eta = by('static_eta');
+    const drift = m.trip_anomaly.by_category[0];
+    const best = m.demand_forecast.models.find(x => x.model === 'gbt_poisson');
+    const parity = m.online_parity || {};
+    document.getElementById('ml-tiles').innerHTML = [
+      tile(`${gbt.mae_min} min`, 'delay error, model', `STATIC ETA ${eta.mae_min} MIN`, true),
+      tile(gbt.auc, 'late-delivery AUC', `STATIC ETA ${eta.auc}`),
+      tile(`${drift.model_flagged}/${drift.trips}`, 'drifting reefers found', `RULE FOUND ${drift.rule_flagged}`, true),
+      tile(best.hourly_wape, 'hourly demand WAPE', 'DAY-AHEAD, ALL WAREHOUSES'),
+      tile(parity.identical_features !== undefined ? `${parity.identical_features}/${parity.compared_with_batch}` : '-',
+           'online = batch features', 'TRAINING/SERVING PARITY')
+    ].join('');
+
+    const r = await api('/api/v1/ml/delay-risk');
+    document.getElementById('risk').innerHTML =
+      `<table><tr><th>SHIPMENT</th><th>CARRIER</th><th>FROM</th><th>P(LATE)</th><th>PREDICTED</th><th>ACTUAL</th></tr>` +
+      r.shipments.map(x => `<tr><td class="mono">${x.shipment_id}</td><td class="mono">${x.carrier_id}</td>
+        <td class="mono">${x.origin_warehouse_id}</td><td class="${x.p_late >= 0.5 ? 'acc' : ''}">${x.p_late.toFixed(2)}</td>
+        <td>${x.predicted_delay_min.toFixed(1)} min</td><td>${x.actual_delay_min.toFixed(1)} min</td></tr>`).join('') + '</table>';
+
+    document.getElementById('trips').innerHTML =
+      `<table><tr><th>TRIP TYPE (TEST WINDOW)</th><th>TRIPS</th><th>FLAGGED BY RULE</th><th>FLAGGED BY MODEL</th></tr>` +
+      m.trip_anomaly.by_category.map(x => `<tr><td>${x.category}</td><td>${x.trips}</td>
+        <td>${x.rule_flagged}</td><td>${x.model_flagged}</td></tr>`).join('') + '</table>';
+
+    const f = await api('/api/v1/ml/forecast');
+    document.getElementById('forecast').innerHTML =
+      `<table><tr><th>WAREHOUSE</th><th>FORECAST ORDERS</th><th>BUSIEST HOUR</th></tr>` +
+      f.warehouses.map(x => `<tr><td class="mono">${x.warehouse_id}</td><td>${x.orders}</td>
+        <td class="mono">${String(x.busiest_hour).slice(11, 16)}</td></tr>`).join('') + '</table>';
+  } catch (err) {
+    document.getElementById('hist-lede').textContent = none;
+    ['risk', 'trips', 'forecast'].forEach(id =>
+      document.getElementById(id).innerHTML = `<p class="empty">${none}</p>`);
+  }
+}
 load();
+loadModels();
 </script>
 </body>
 </html>

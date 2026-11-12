@@ -1,7 +1,11 @@
-# Core: everything the offline demo and the test suite need.
+# Core: everything the offline demo, the history run, the models and the
+# test suite need.
 pyyaml>=6.0
 duckdb>=1.0
 pyarrow>=15.0
+numpy>=1.24
+pandas>=2.0
+scikit-learn>=1.3
 
 # Serving
 fastapi>=0.110
@@ -9,3 +13,4 @@ uvicorn>=0.29
 
 # Development
 pytest>=8.0
+httpx>=0.27

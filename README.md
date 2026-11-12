@@ -6,8 +6,10 @@ A locally hosted logistics intelligence platform. A controlled simulator
 generates vehicle GPS, cold-chain sensor, warehouse scan and shipment
 lifecycle events over a Jodhpur road network; Kafka carries them; a
 validation and event-time processing layer turns them into cold-chain and
-route-deviation alerts; and a Bronze/Silver/Gold lakehouse turns them into
-delivery analytics.
+route-deviation alerts; PostgreSQL holds the operational state; a
+Bronze/Silver/Gold lakehouse turns them into delivery analytics; and models
+trained on five weeks of simulated history predict delivery delay, find
+reefer and dwell anomalies the fixed rules miss, and forecast demand.
 
 Everything is open source and runs on a laptop.
 
@@ -62,7 +64,7 @@ through the bus, validates and deduplicates them, detects excursions and
 deviations, lands Bronze, builds Silver and Gold, and prints a report:
 
 ```
-scenario            COLD_CHAIN_EXCURSION   seed 42   7.0s
+scenario            COLD_CHAIN_EXCURSION   seed 42   3.12s
 ----------------------------------------------------------------
 published           40206
 consumed            40206
@@ -81,20 +83,83 @@ Other entry points:
 
 ```bash
 make scenarios      # run all seven fault scenarios and compare the outcomes
-make test           # 38 tests: unit, detector and end-to-end scenario tests
+make test           # 57 tests; the PostgreSQL ones skip without a database,
+                    # the broker one runs with: make test-kafka
 make api            # dashboard and API on http://127.0.0.1:8000
 make demo SCENARIO=ROUTE_DEVIATION SEED=7
 ```
+
+## Five weeks of history and the models
+
+```bash
+make history        # 35 days, ~3,900 shipments, ~200,000 events, same pipeline
+make ml             # train, evaluate (rolling origin) and register the models
+```
+
+The history has demand that follows the hour and the weekday, peak-hour
+congestion, carriers of different reliability, warehouse backlog, transit
+incidents and a few injected faults whose ground truth goes to
+`data/history/labels.json`, which is opened only to score. The models read
+Gold only. Results from the group laptop (seed 42, `docs/ml_report.json`):
+
+```
+delay at dispatch   rolling origin over 14 days, 1590 shipments, 9.7% late
+  model                 MAE min    RMSE    AUC   prec  recall
+  promise                  18.9   23.12    0.5      -     0.0
+  static_eta               6.76   10.23  0.747   0.87   0.214
+  carrier_hour_mean        9.72   17.86  0.674   0.00     0.0
+  linear                   6.72    9.66  0.811   0.74   0.221
+  gbt                      5.71    8.69  0.821   0.64   0.305
+
+reefer trips        481 test trips, model flags vs the 8 C rule
+  drift (under 8 C)          19 trips   rule   0   model  16
+  excursion (over 8 C)        6 trips   rule   6   model   6
+  single spikes only         71 trips   rule   0   model   3
+  normal                    385 trips   rule   0   model   0
+
+demand, day ahead   7 days, 1.39 orders per warehouse-hour
+  gbt_poisson            hourly WAPE 0.686  daily WAPE 0.196
+  true_rate (floor)      hourly WAPE 0.651  daily WAPE 0.162
+
+online vs batch     3887 of 3890 dispatches identical; differing fields {'origin_orders_2h': 3}
+```
+
+For dwell, a fixed 60-minute threshold already finds all 29 held shipments
+with no false alarm; the per-warehouse robust score finds the same 29 plus 3
+false alarms, so the rule stays. Models are versioned in `data/models/`
+by a hash of feature definition, training window, data fingerprint and
+parameters (ADR 006).
 
 ## Run it against the real stack
 
 ```bash
 make up             # Apache Kafka (KRaft) + PostgreSQL, pinned images
+make install-kafka  # confluent-kafka and psycopg
 make topics         # create topics with their keys and 7-day retention
 make db-migrate     # apply the SQL migrations
 make demo-kafka     # same pipeline, real broker
+make demo-postgres  # offline pipeline that also writes the operational store
+make stream         # the pipeline as a long-running consumer (checkpoints, Bronze, Postgres)
+make produce RATE=2000   # in another terminal: publish a scenario at 2,000 events/s
+make bench          # latency, capacity and crash recovery, written to data/bench/
 make down           # stop; 'make reset' also wipes the volumes
 ```
+
+The stream consumer saves its detector state and the offsets it belongs to
+in one checkpoint each second; after a crash it restores both, so its counts
+are exactly those of an uninterrupted run, and alerts repeated after the
+restart carry the same id (ADR 007). Measured on the group laptop (Kafka 3.9
+single node, 4-vCPU Linux VM, `docs/bench_report.json`):
+
+| Input rate (events/s) | 1,000 | 4,000 | 16,000 | 32,000 |
+|---|---|---|---|---|
+| Event latency p50 / p99 (ms) | 10.8 / 35.5 | 11.0 / 32.7 | 13.2 / 41.2 | 16.0 / 40.2 |
+| Alert latency p50 (ms) | 17.1 | 18.4 | 17.9 | 21.2 |
+
+One consumer drains 51,600 events/s. Killed with SIGKILL at 2,000 events/s,
+it was processing again 0.22 s later, with the same final counts and the
+same 12 alerts as the offline run; 7 alert messages were repeated, with the
+same ids.
 
 `make reset` exists because wiping a Kafka volume without wiping the stored
 cluster id leaves a broker that will not start. The target removes both
@@ -118,16 +183,27 @@ src/lil/
   processing/coldchain.py   sustained excursion detection, spike suppression
   processing/deviation.py   corridor departure with a persistence threshold
   processing/pipeline.py    validate -> dedup -> lateness -> detect -> land
+  sim/history.py       five weeks of operations with known injected faults
   storage/lakehouse.py Bronze/Silver/Gold as Parquet, queried with DuckDB
+  storage/operational.py  idempotent PostgreSQL writer
   analytics/kpis.py    OTIF, delay, dwell and excursion definitions
-  api/app.py           FastAPI serving layer over Gold
+  ml/features.py       delay features, one definition for batch and online
+  ml/delay.py          delay at dispatch: baselines, linear, gradient boosting
+  ml/anomaly.py        reefer trips (isolation forest) and dwell (median/MAD)
+  ml/forecast.py       day-ahead demand per warehouse and hour
+  ml/online.py         the delay model inside the stream, and the parity check
+  ml/registry.py       versioned models with their data fingerprint
+  stream.py            long-running Kafka consumer with checkpoints
+  bench.py             latency, capacity and recovery on the broker
+  api/app.py           FastAPI serving layer over Gold and the model outputs
   runner.py            one end-to-end run, used by the demo and the tests
 db/migrations/         PostgreSQL schema: master data, append-only history,
-                       alerts, quarantine, late events
+                       alerts, quarantine, late events, run provenance
 schemas/json/          the event contracts
-dashboard/index.html   live operations, alerts, carriers, data quality
-docs/                  architecture, PRD, phases, design and five ADRs
-tests/                 38 tests
+dashboard/index.html   live operations, alerts, carriers, data quality, models
+docs/                  architecture, PRD, phases, design, eight ADRs and the
+                       evidence files the final report quotes
+tests/                 57 tests
 ```
 
 ## The rules the system actually enforces
@@ -140,6 +216,8 @@ tests/                 38 tests
 | Allowed lateness | `processing/watermark.py` | 5 minutes, then the late side output |
 | Deduplication | `processing/dedup.py` | on `event_id`, within a 1 hour window |
 | Retention | `compose.yml`, `scripts/create_topics.sh` | 7 days on raw topics |
+| Checkpoint | `stream.py` | detector state + offsets together, every second |
+| Delay-risk alert | `ml/online.py` | P(late) at dispatch of at least 0.5 |
 
 Every one of these lives in `config/config.yaml`. Nothing in `src/` hard-codes
 an endpoint or a threshold.
@@ -168,6 +246,7 @@ humidity 150) so the quarantine path is exercised in all of them.
 | Lakehouse | Parquet + DuckDB | Apache-2.0 / MIT | no object-store service to operate; see ADR 004 |
 | Simulation | built-in road graph | this repo | runs with nothing installed; SUMO is a drop-in backend |
 | Serving | FastAPI + static HTML | MIT | one dependency, no BI server |
+| Models | scikit-learn | BSD-3 | gradient boosting and isolation forest without another native dependency |
 
 ## Limitations we state rather than hide
 
@@ -176,4 +255,14 @@ humidity 150) so the quarantine path is exercised in all of them.
   ones that matter here: event time, watermarks, lateness, deduplication and
   idempotent alerting.
 * Iceberg snapshots and time travel are not implemented; ADR 004 says why.
-* No production IAM, no multi-AZ, no autoscaling. Out of scope from Lab 1.
+* One consumer process. Scaling out needs keyed state per partition, which
+  is what Flink provides; the checkpoint design is the same idea (ADR 007).
+* The watermark is global, so replaying far faster than real time makes
+  partition skew show up as extra late events (369 at 4,000 events/s, 712 at
+  32,000). Detection counts are unaffected because detectors are keyed and use
+  event time; a per-partition watermark would remove the effect.
+* The models learn the simulator's world. About a third of late deliveries
+  in the test window came from en-route incidents that nothing known at
+  dispatch can predict, which caps recall.
+* No Avro registry, CDC, MQTT, Airflow or dbt. No production IAM, no
+  multi-AZ, no autoscaling. Out of scope from Lab 1.

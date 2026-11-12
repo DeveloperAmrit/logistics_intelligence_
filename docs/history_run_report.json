@@ -1,0 +1,372 @@
+{
+  "scenario": "HISTORY_35D",
+  "seed": 42,
+  "published": 199885,
+  "stats": {
+    "consumed": 199885,
+    "valid": 197208,
+    "quarantined": 1658,
+    "duplicates": 1019,
+    "on_time": 196607,
+    "late_within_tolerance": 11,
+    "late_side_output": 590,
+    "cold_chain_alerts": 18,
+    "route_deviation_alerts": 47,
+    "model_alerts": 0,
+    "suppressed_spikes": 162,
+    "quarantine_by_reason": {
+      "GPS_LATITUDE_RANGE": 1455,
+      "SENSOR_HUMIDITY_RANGE": 203
+    }
+  },
+  "bronze_rows": 197208,
+  "silver": {
+    "silver_gps": 134184,
+    "silver_sensor": 20234,
+    "silver_warehouse": 19450,
+    "silver_shipment_status": 23340
+  },
+  "gold": {
+    "dim_shipment": 3890,
+    "dim_date": 35,
+    "dim_carrier": 6,
+    "dim_warehouse": 5,
+    "dim_route": 20,
+    "dim_vehicle": 40,
+    "fact_delivery_performance": 3890,
+    "fact_cold_chain_excursion": 18,
+    "fact_warehouse_dwell": 3890,
+    "fact_hourly_demand": 4160,
+    "fact_sensor_trip": 1178,
+    "fact_alert": 65
+  },
+  "kpis": {
+    "delivery": {
+      "shipments": 3890,
+      "delivered": 3890,
+      "otif_pct": 89.9,
+      "median_delay_min": -17.4,
+      "p95_delay_min": 10.1
+    },
+    "cold_chain": {
+      "excursions": 18,
+      "peak_temperature": 11.44,
+      "mean_duration_min": 11.0
+    },
+    "dwell": {
+      "shipments": 3890,
+      "median_dwell_min": 22.7,
+      "max_dwell_min": 178.9
+    },
+    "carriers": [
+      {
+        "carrier_id": "car-004",
+        "shipments": 777,
+        "otif_pct": 94.3,
+        "median_delay_min": -20.5
+      },
+      {
+        "carrier_id": "car-001",
+        "shipments": 835,
+        "otif_pct": 92.6,
+        "median_delay_min": -18.5
+      },
+      {
+        "carrier_id": "car-005",
+        "shipments": 476,
+        "otif_pct": 89.7,
+        "median_delay_min": -17.7
+      },
+      {
+        "carrier_id": "car-006",
+        "shipments": 698,
+        "otif_pct": 89.4,
+        "median_delay_min": -15.3
+      },
+      {
+        "carrier_id": "car-002",
+        "shipments": 598,
+        "otif_pct": 87.5,
+        "median_delay_min": -16.2
+      }
+    ]
+  },
+  "alerts": [
+    {
+      "alert_type": "route_deviation",
+      "alert_id": "alert-rd-veh-012-1788750603",
+      "vehicle_id": "veh-012",
+      "shipment_id": "ship-h00010",
+      "route_id": "route-005",
+      "rule_id": "RD-01",
+      "severity": "WARNING",
+      "start_event_time": "2026-09-07T03:10:03.119502Z",
+      "trigger_event_id": "30acc1d4-61f1-4f74-8dd3-9edad5f14d50",
+      "observed_latitude": 26.227496,
+      "observed_longitude": 72.988316,
+      "deviation_metres": 338.9,
+      "explanation": "outside the 250 m corridor for 60 s, peak 339 m",
+      "trigger_ingest_time": "2026-09-07T03:11:03.119502Z"
+    },
+    {
+      "alert_type": "route_deviation",
+      "alert_id": "alert-rd-veh-018-1788948199",
+      "vehicle_id": "veh-018",
+      "shipment_id": "ship-h00274",
+      "route_id": "route-006",
+      "rule_id": "RD-01",
+      "severity": "WARNING",
+      "start_event_time": "2026-09-09T10:03:19.035016Z",
+      "trigger_event_id": "e73563ab-09ce-4bb7-8f8d-a2115dcf9306",
+      "observed_latitude": 26.253804,
+      "observed_longitude": 73.01549,
+      "deviation_metres": 478.2,
+      "explanation": "outside the 250 m corridor for 60 s, peak 478 m",
+      "trigger_ingest_time": "2026-09-09T10:04:19.035016Z"
+    },
+    {
+      "alert_type": "route_deviation",
+      "alert_id": "alert-rd-veh-018-1788948799",
+      "vehicle_id": "veh-018",
+      "shipment_id": "ship-h00274",
+      "route_id": "route-006",
+      "rule_id": "RD-01",
+      "severity": "WARNING",
+      "start_event_time": "2026-09-09T10:13:19.035016Z",
+      "trigger_event_id": "4e912e34-c880-422a-9963-2ac323d57063",
+      "observed_latitude": 26.290014,
+      "observed_longitude": 73.014877,
+      "deviation_metres": 406.6,
+      "explanation": "outside the 250 m corridor for 60 s, peak 407 m",
+      "trigger_ingest_time": "2026-09-09T10:14:19.035016Z"
+    },
+    {
+      "alert_type": "cold_chain",
+      "alert_id": "alert-cc-ship-h00300-1788957825",
+      "shipment_id": "ship-h00300",
+      "sensor_id": "sen-002",
+      "rule_id": "CC-01",
+      "severity": "CRITICAL",
+      "start_event_time": "2026-09-09T12:43:45.856355Z",
+      "trigger_event_id": "70bd4f11-c33d-414b-a74a-0ed2dd8ddcd2",
+      "trigger_event_time": "2026-09-09T12:45:45.856355Z",
+      "max_temperature": 11.42,
+      "readings": 2,
+      "explanation": "temperature above 8.0 C for 2 consecutive readings (120 s), peak 11.4 C",
+      "trigger_ingest_time": "2026-09-09T12:45:45.856355Z"
+    },
+    {
+      "alert_type": "route_deviation",
+      "alert_id": "alert-rd-veh-019-1789013338",
+      "vehicle_id": "veh-019",
+      "shipment_id": "ship-h00337",
+      "route_id": "route-014",
+      "rule_id": "RD-01",
+      "severity": "WARNING",
+      "start_event_time": "2026-09-10T04:08:58.548548Z",
+      "trigger_event_id": "0e259830-ede6-4cb7-83d1-79a5e6feeea1",
+      "observed_latitude": 26.29088,
+      "observed_longitude": 73.016498,
+      "deviation_metres": 406.6,
+      "explanation": "outside the 250 m corridor for 60 s, peak 407 m",
+      "trigger_ingest_time": "2026-09-10T04:09:58.548548Z"
+    },
+    {
+      "alert_type": "route_deviation",
+      "alert_id": "alert-rd-veh-019-1789013638",
+      "vehicle_id": "veh-019",
+      "shipment_id": "ship-h00337",
+      "route_id": "route-014",
+      "rule_id": "RD-01",
+      "severity": "WARNING",
+      "start_event_time": "2026-09-10T04:13:58.548548Z",
+      "trigger_event_id": "db2c1e34-465a-45f0-a93e-4b286e280cbd",
+      "observed_latitude": 26.272635,
+      "observed_longitude": 73.012275,
+      "deviation_metres": 478.2,
+      "explanation": "outside the 250 m corridor for 60 s, peak 478 m",
+      "trigger_ingest_time": "2026-09-10T04:14:58.548548Z"
+    },
+    {
+      "alert_type": "route_deviation",
+      "alert_id": "alert-rd-veh-001-1789106293",
+      "vehicle_id": "veh-001",
+      "shipment_id": "ship-h00463",
+      "route_id": "route-016",
+      "rule_id": "RD-01",
+      "severity": "WARNING",
+      "start_event_time": "2026-09-11T05:58:13.243369Z",
+      "trigger_event_id": "8fd6f306-599b-4f9d-924c-edf3ec3ab7bf",
+      "observed_latitude": 26.291912,
+      "observed_longitude": 73.030615,
+      "deviation_metres": 568.3,
+      "explanation": "outside the 250 m corridor for 60 s, peak 568 m",
+      "trigger_ingest_time": "2026-09-11T05:59:13.243369Z"
+    },
+    {
+      "alert_type": "cold_chain",
+      "alert_id": "alert-cc-ship-h00533-1789138215",
+      "shipment_id": "ship-h00533",
+      "sensor_id": "sen-001",
+      "rule_id": "CC-01",
+      "severity": "CRITICAL",
+      "start_event_time": "2026-09-11T14:50:15.348684Z",
+      "trigger_event_id": "3cc3ce5c-f07f-49c9-8592-eae43fa83b96",
+      "trigger_event_time": "2026-09-11T14:52:15.348684Z",
+      "max_temperature": 10.78,
+      "readings": 2,
+      "explanation": "temperature above 8.0 C for 2 consecutive readings (120 s), peak 10.8 C",
+      "trigger_ingest_time": "2026-09-11T14:52:15.348684Z"
+    },
+    {
+      "alert_type": "route_deviation",
+      "alert_id": "alert-rd-veh-027-1789190010",
+      "vehicle_id": "veh-027",
+      "shipment_id": "ship-h00566",
+      "route_id": "route-015",
+      "rule_id": "RD-01",
+      "severity": "WARNING",
+      "start_event_time": "2026-09-12T05:13:30.908496Z",
+      "trigger_event_id": "e9a5a61a-c69e-4105-aa91-f48befb99359",
+      "observed_latitude": 26.334727,
+      "observed_longitude": 73.086643,
+      "deviation_metres": 789.0,
+      "explanation": "outside the 250 m corridor for 60 s, peak 789 m",
+      "trigger_ingest_time": "2026-09-12T05:14:30.908496Z"
+    },
+    {
+      "alert_type": "route_deviation",
+      "alert_id": "alert-rd-veh-022-1789353724",
+      "vehicle_id": "veh-022",
+      "shipment_id": "ship-h00713",
+      "route_id": "route-003",
+      "rule_id": "RD-01",
+      "severity": "WARNING",
+      "start_event_time": "2026-09-14T02:42:04.605152Z",
+      "trigger_event_id": "755df5f6-a27a-4b58-b52f-696684c39241",
+      "observed_latitude": 26.309563,
+      "observed_longitude": 73.036722,
+      "deviation_metres": 599.5,
+      "explanation": "outside the 250 m corridor for 60 s, peak 599 m",
+      "trigger_ingest_time": "2026-09-14T02:43:04.605152Z"
+    }
+  ],
+  "quarantine_sample": [
+    {
+      "event_id": "fd6629d1-a81d-4130-8f77-4dcdd10556d4",
+      "event_type": "gps.telemetry",
+      "reasons": [
+        {
+          "rule_id": "GPS_LATITUDE_RANGE",
+          "field": "latitude",
+          "observed": 200.0,
+          "expected": "[-90.0, 90.0]",
+          "severity": "ERROR"
+        }
+      ],
+      "reason_codes": [
+        "GPS_LATITUDE_RANGE"
+      ],
+      "raw_payload": {
+        "event_type": "gps.telemetry",
+        "event_time": "2026-09-07T02:36:02.120786Z",
+        "source": "simulator",
+        "payload": {
+          "latitude": 200.0,
+          "longitude": 73.012057,
+          "speed_kph": 27.88
+        },
+        "event_id": "fd6629d1-a81d-4130-8f77-4dcdd10556d4",
+        "ingest_time": "2026-09-07T02:36:02.120786Z",
+        "schema_version": "1.1",
+        "vehicle_id": "veh-006",
+        "sensor_id": null,
+        "shipment_id": "ship-h00003",
+        "warehouse_id": null,
+        "route_id": "route-010"
+      },
+      "arrival_time": "2026-09-07T02:36:02.120786Z",
+      "source": "simulator"
+    },
+    {
+      "event_id": "f3d23d06-497d-4d6f-9389-0e8b0fc0b5ae",
+      "event_type": "gps.telemetry",
+      "reasons": [
+        {
+          "rule_id": "GPS_LATITUDE_RANGE",
+          "field": "latitude",
+          "observed": 200.0,
+          "expected": "[-90.0, 90.0]",
+          "severity": "ERROR"
+        }
+      ],
+      "reason_codes": [
+        "GPS_LATITUDE_RANGE"
+      ],
+      "raw_payload": {
+        "event_type": "gps.telemetry",
+        "event_time": "2026-09-07T03:01:49.449160Z",
+        "source": "simulator",
+        "payload": {
+          "latitude": 200.0,
+          "longitude": 73.006337,
+          "speed_kph": 25.05
+        },
+        "event_id": "f3d23d06-497d-4d6f-9389-0e8b0fc0b5ae",
+        "ingest_time": "2026-09-07T03:01:49.449160Z",
+        "schema_version": "1.1",
+        "vehicle_id": "veh-007",
+        "sensor_id": null,
+        "shipment_id": "ship-h00008",
+        "warehouse_id": null,
+        "route_id": "route-018"
+      },
+      "arrival_time": "2026-09-07T03:01:49.449160Z",
+      "source": "simulator"
+    },
+    {
+      "event_id": "3dcd1a78-6e59-49c5-8f59-5552368ac208",
+      "event_type": "gps.telemetry",
+      "reasons": [
+        {
+          "rule_id": "GPS_LATITUDE_RANGE",
+          "field": "latitude",
+          "observed": 200.0,
+          "expected": "[-90.0, 90.0]",
+          "severity": "ERROR"
+        }
+      ],
+      "reason_codes": [
+        "GPS_LATITUDE_RANGE"
+      ],
+      "raw_payload": {
+        "event_type": "gps.telemetry",
+        "event_time": "2026-09-07T04:00:35.242339Z",
+        "source": "simulator",
+        "payload": {
+          "latitude": 200.0,
+          "longitude": 72.987124,
+          "speed_kph": 16.96
+        },
+        "event_id": "3dcd1a78-6e59-49c5-8f59-5552368ac208",
+        "ingest_time": "2026-09-07T04:00:35.242339Z",
+        "schema_version": "1.1",
+        "vehicle_id": "veh-006",
+        "sensor_id": null,
+        "shipment_id": "ship-h00014",
+        "warehouse_id": null,
+        "route_id": "route-008"
+      },
+      "arrival_time": "2026-09-07T04:00:35.242339Z",
+      "source": "simulator"
+    }
+  ],
+  "replay_match": true,
+  "sizes": {
+    "bronze_bytes": 13250304,
+    "silver_bytes": 7429864,
+    "gold_bytes": 340106
+  },
+  "seconds": 63.7,
+  "operational": null
+}

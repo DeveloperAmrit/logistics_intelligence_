@@ -66,3 +66,14 @@ class ScenarioSettings:
             base.excursion_seconds = 1200
             base.excursion_celsius = 10.5
         return base
+
+    @classmethod
+    def benchmark_mix(cls, invalid_rate: float = 0.01) -> "ScenarioSettings":
+        """Every fault at once, for the broker benchmark: excursions, deviations,
+        duplicates, late events and a dropout in the same hour. Not one of the
+        seven named scenarios, so their expected outcomes are unaffected."""
+        return cls(name="BENCHMARK_MIX", invalid_rate=invalid_rate, dropout_seconds=300,
+                   duplicate_rate=0.01, late_rate=0.01, deviation_vehicles=3,
+                   deviation_metres=900.0, excursion_sensors=4, excursion_seconds=1200,
+                   excursion_celsius=10.5)
+

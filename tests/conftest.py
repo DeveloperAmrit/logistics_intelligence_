@@ -18,3 +18,24 @@ def cfg():
     config["simulation"]["vehicles"] = 12
     config["simulation"]["sensors"] = 8
     return config
+
+
+@pytest.fixture(scope="session")
+def small_history(tmp_path_factory):
+    """Ten simulated days through the full pipeline, shared by the history,
+    model and API tests. Everything lives under one temporary root."""
+    from lil.runner import run_history
+    root = tmp_path_factory.mktemp("lil")
+    config = load_config()
+    config["storage"]["root"] = str(root / "lake")
+    config["ml"]["registry"] = str(root / "models")
+    config["ml"]["test_days"] = 3
+    config["ml"]["forecast_test_days"] = 2
+    result = run_history(days=10, seed=7, cfg=config, run_dir=root / "history")
+    return {"root": root, "cfg": config, "result": result, "dir": root / "history"}
+
+
+@pytest.fixture(scope="session")
+def small_ml(small_history):
+    from lil.ml.train import train_all
+    return train_all(small_history["cfg"], small_history["dir"], online_check=True)

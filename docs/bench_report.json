@@ -1,0 +1,286 @@
+{
+  "bootstrap": "localhost:9092",
+  "seed": 42,
+  "partitions": 6,
+  "workload": "BENCHMARK_MIX",
+  "cpu_count": 4,
+  "updated": "2026-11-12T13:00:43+00:00",
+  "offline_reference": {
+    "counts": {
+      "consumed": 40646,
+      "valid": 39778,
+      "quarantined": 430,
+      "duplicates": 438,
+      "cold_chain_alerts": 7,
+      "route_deviation_alerts": 5
+    },
+    "alerts": 12,
+    "published": 40646
+  },
+  "capacity": {
+    "events": 40646,
+    "repeats": 3,
+    "producer_rate": 47364.2,
+    "consumer_rate": 51625.6,
+    "consumer_rates": [
+      51757.2,
+      51625.6,
+      51098.6
+    ],
+    "processed": 40646
+  },
+  "recovery": {
+    "rate": 2000.0,
+    "killed_after_seconds": 6.0,
+    "processed_before_kill_at_least": 11968,
+    "events_in_restored_state": 10277,
+    "processed_after_restart": 30369,
+    "reprocessed_events": 1691,
+    "gap_seconds": 0.224,
+    "caught_up_seconds_after_kill": 0.275,
+    "alerts_received": 19,
+    "distinct_alerts": 12,
+    "duplicate_alert_messages": 7,
+    "final_counts": {
+      "consumed": 40646,
+      "valid": 39778,
+      "quarantined": 430,
+      "duplicates": 438,
+      "cold_chain_alerts": 7,
+      "route_deviation_alerts": 5
+    },
+    "total_events": 40646,
+    "counts_match_offline": true,
+    "alert_set_matches_offline": true
+  },
+  "latency": [
+    {
+      "rate": 1000.0,
+      "achieved_rate": 1000.0,
+      "events": 40646,
+      "event_latency_ms": {
+        "count": 40646,
+        "p50": 10.8,
+        "p95": 17.0,
+        "p99": 35.5,
+        "max": 138.7
+      },
+      "alert_latency_ms": {
+        "count": 12,
+        "p50": 17.1,
+        "p95": 21.6,
+        "p99": 21.8,
+        "max": 21.9
+      },
+      "alerts_seen": 12,
+      "checkpoint_ms": {
+        "p50": 25.02,
+        "p95": 51.71,
+        "max": 56.99,
+        "count": 44
+      },
+      "stats": {
+        "consumed": 40646,
+        "valid": 39778,
+        "quarantined": 430,
+        "duplicates": 438,
+        "cold_chain_alerts": 7,
+        "route_deviation_alerts": 5,
+        "late_within_tolerance": 179,
+        "late_side_output": 369
+      },
+      "consumer_rate": 1003.3,
+      "counts_match_offline": true
+    },
+    {
+      "rate": 2000.0,
+      "achieved_rate": 2000.0,
+      "events": 40646,
+      "event_latency_ms": {
+        "count": 40646,
+        "p50": 10.9,
+        "p95": 17.3,
+        "p99": 34.9,
+        "max": 68.6
+      },
+      "alert_latency_ms": {
+        "count": 12,
+        "p50": 17.6,
+        "p95": 41.8,
+        "p99": 55.0,
+        "max": 58.3
+      },
+      "alerts_seen": 12,
+      "checkpoint_ms": {
+        "p50": 26.79,
+        "p95": 52.15,
+        "max": 54.16,
+        "count": 24
+      },
+      "stats": {
+        "consumed": 40646,
+        "valid": 39778,
+        "quarantined": 430,
+        "duplicates": 438,
+        "cold_chain_alerts": 7,
+        "route_deviation_alerts": 5,
+        "late_within_tolerance": 187,
+        "late_side_output": 369
+      },
+      "consumer_rate": 2005.0,
+      "counts_match_offline": true
+    },
+    {
+      "rate": 4000.0,
+      "achieved_rate": 3999.9,
+      "events": 40646,
+      "event_latency_ms": {
+        "count": 40646,
+        "p50": 11.0,
+        "p95": 17.4,
+        "p99": 32.7,
+        "max": 64.4
+      },
+      "alert_latency_ms": {
+        "count": 12,
+        "p50": 18.4,
+        "p95": 21.9,
+        "p99": 22.9,
+        "max": 23.2
+      },
+      "alerts_seen": 12,
+      "checkpoint_ms": {
+        "p50": 24.92,
+        "p95": 51.68,
+        "max": 53.33,
+        "count": 14
+      },
+      "stats": {
+        "consumed": 40646,
+        "valid": 39778,
+        "quarantined": 430,
+        "duplicates": 438,
+        "cold_chain_alerts": 7,
+        "route_deviation_alerts": 5,
+        "late_within_tolerance": 292,
+        "late_side_output": 369
+      },
+      "consumer_rate": 4021.3,
+      "counts_match_offline": true
+    },
+    {
+      "rate": 8000.0,
+      "achieved_rate": 7999.4,
+      "events": 40646,
+      "event_latency_ms": {
+        "count": 40646,
+        "p50": 11.0,
+        "p95": 17.6,
+        "p99": 37.7,
+        "max": 99.3
+      },
+      "alert_latency_ms": {
+        "count": 12,
+        "p50": 16.7,
+        "p95": 19.7,
+        "p99": 20.0,
+        "max": 20.1
+      },
+      "alerts_seen": 12,
+      "checkpoint_ms": {
+        "p50": 21.14,
+        "p95": 54.6,
+        "max": 57.8,
+        "count": 9
+      },
+      "stats": {
+        "consumed": 40646,
+        "valid": 39778,
+        "quarantined": 430,
+        "duplicates": 438,
+        "cold_chain_alerts": 7,
+        "route_deviation_alerts": 5,
+        "late_within_tolerance": 401,
+        "late_side_output": 489
+      },
+      "consumer_rate": 8111.6,
+      "counts_match_offline": true
+    },
+    {
+      "rate": 16000.0,
+      "achieved_rate": 15996.9,
+      "events": 40646,
+      "event_latency_ms": {
+        "count": 40646,
+        "p50": 13.2,
+        "p95": 20.3,
+        "p99": 41.2,
+        "max": 74.1
+      },
+      "alert_latency_ms": {
+        "count": 12,
+        "p50": 17.9,
+        "p95": 25.8,
+        "p99": 27.3,
+        "max": 27.7
+      },
+      "alerts_seen": 12,
+      "checkpoint_ms": {
+        "p50": 50.74,
+        "p95": 51.89,
+        "max": 51.91,
+        "count": 7
+      },
+      "stats": {
+        "consumed": 40646,
+        "valid": 39778,
+        "quarantined": 430,
+        "duplicates": 438,
+        "cold_chain_alerts": 7,
+        "route_deviation_alerts": 5,
+        "late_within_tolerance": 395,
+        "late_side_output": 683
+      },
+      "consumer_rate": 16269.4,
+      "counts_match_offline": true
+    },
+    {
+      "rate": 32000.0,
+      "achieved_rate": 31989.0,
+      "events": 40646,
+      "event_latency_ms": {
+        "count": 40646,
+        "p50": 16.0,
+        "p95": 25.1,
+        "p99": 40.2,
+        "max": 72.0
+      },
+      "alert_latency_ms": {
+        "count": 12,
+        "p50": 21.2,
+        "p95": 39.3,
+        "p99": 44.5,
+        "max": 45.8
+      },
+      "alerts_seen": 12,
+      "checkpoint_ms": {
+        "p50": 31.15,
+        "p95": 43.0,
+        "max": 45.11,
+        "count": 6
+      },
+      "stats": {
+        "consumed": 40646,
+        "valid": 39778,
+        "quarantined": 430,
+        "duplicates": 438,
+        "cold_chain_alerts": 7,
+        "route_deviation_alerts": 5,
+        "late_within_tolerance": 400,
+        "late_side_output": 712
+      },
+      "consumer_rate": 32889.5,
+      "counts_match_offline": true
+    }
+  ]
+}

@@ -22,6 +22,7 @@ kafka:
     shipment: raw.shipment
     cold_chain_alert: alerts.cold_chain
     route_deviation_alert: alerts.route_deviation
+    delay_risk_alert: alerts.delay_risk
     dlq: quarantine.dlq
   partitions: 6
   retention_days: 7
@@ -52,6 +53,32 @@ storage:
   format: parquet
   bronze_partition: event_date
 
+# Weeks of operations for analytics and the models (make history).
+history:
+  days: 35
+  start_date: "2026-09-07"       # a Monday
+  gps_interval_seconds: 60       # coarser than the live 5 s; enough for trips and corridors
+  sensor_interval_seconds: 120
+  cold_share: 0.30
+  incident_rate: 0.05            # transit stops of 10-40 minutes
+  detour_rate: 0.01
+  drift_rate: 0.04               # reefer drifts upward but stays under 8 C: the rule cannot see it
+  excursion_rate: 0.02
+  stuck_rate: 0.015              # shipment held at the dock for 1-2.5 hours
+  invalid_rate: 0.01
+  duplicate_rate: 0.005
+  late_rate: 0.003
+
+ml:
+  registry: data/models
+  test_days: 14                  # rolling origin: retrain before each of the last 14 days
+  carrier_window_days: 7         # trailing window for carrier reliability features
+  backlog_window_hours: 2
+  delay_risk_threshold: 0.5      # online alert when P(late) is at least this
+  anomaly_quantile: 0.95         # flag trips less typical than 95 % of the training trips
+  dwell_z_threshold: 3.5
+  forecast_test_days: 7
+
 postgres:
   host: localhost
   port: 5432
@@ -62,3 +89,13 @@ postgres:
 api:
   host: 127.0.0.1
   port: 8000
+
+# Long-running consumer on the real broker (make stream / make bench).
+stream:
+  group_id: lil.stream
+  instance_id: lil-stream-1      # static membership: a restart reclaims partitions at once
+  session_timeout_ms: 10000
+  checkpoint_seconds: 1.0        # state + offsets saved together this often
+  checkpoint_dir: data/checkpoints
+  poll_batch: 500
+  poll_timeout_ms: 10            # return a partial batch after this long; lower = less latency, more polling

@@ -1,5 +1,5 @@
 
-scenario            COLD_CHAIN_EXCURSION   seed 42   6.6s
+scenario            COLD_CHAIN_EXCURSION   seed 42   3.12s
 ----------------------------------------------------------------
 published           40206
 consumed            40206
@@ -14,10 +14,10 @@ deviation alerts    0
 replay count match  True
 bronze rows         39794
 silver              {'silver_gps': 32929, 'silver_sensor': 5569, 'silver_warehouse': 588, 'silver_shipment_status': 708}
-gold                {'dim_shipment': 120, 'dim_date': 1, 'fact_delivery_performance': 120, 'fact_cold_chain_excursion': 7, 'fact_warehouse_dwell': 120}
+gold                {'dim_shipment': 120, 'dim_date': 1, 'dim_carrier': 6, 'dim_warehouse': 5, 'dim_route': 8, 'dim_vehicle': 40, 'fact_delivery_performance': 120, 'fact_cold_chain_excursion': 7, 'fact_warehouse_dwell': 120, 'fact_hourly_demand': 5, 'fact_sensor_trip': 39, 'fact_alert': 7}
 OTIF                77.8%  median delay -11.8 min  p95 10.2 min
 excursions in gold  7  peak 11.39 C
-parquet on disk     {'bronze_bytes': 1582852, 'silver_bytes': 1114040, 'gold_bytes': 10052}
+parquet on disk     {'bronze_bytes': 1584191, 'silver_bytes': 1126778, 'gold_bytes': 24740}
 
 scenario                   valid   quar  dupes late.tol late.side   cc   rd
 ----------------------------------------------------------------------------

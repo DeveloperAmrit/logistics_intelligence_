@@ -6,7 +6,7 @@ PARTITIONS="${PARTITIONS:-6}"
 RETENTION_MS=$((7 * 24 * 60 * 60 * 1000))   # seven days
 
 TOPICS=(raw.gps raw.sensor raw.warehouse raw.shipment
-        alerts.cold_chain alerts.route_deviation quarantine.dlq)
+        alerts.cold_chain alerts.route_deviation alerts.delay_risk quarantine.dlq)
 
 for topic in "${TOPICS[@]}"; do
   docker compose exec -T kafka /opt/kafka/bin/kafka-topics.sh \

@@ -1,0 +1,17 @@
+{
+  "machine": "aarch64",
+  "system": "Linux",
+  "release": "6.8.0-138-generic",
+  "python": "3.10.12",
+  "cpus": 4,
+  "scikit-learn": "1.7.2",
+  "duckdb": "1.5.6",
+  "pyarrow": "25.0.1",
+  "confluent-kafka": "2",
+  "librdkafka": "2.16.0",
+  "numpy": "2.2.6",
+  "pandas": "2.3.3",
+  "kafka_broker": "3.9.0 (KRaft, single node)",
+  "java": "OpenJDK 11",
+  "memory": "MemTotal:        4000488 kB"
+}

@@ -12,6 +12,7 @@
     "late_side_output": 0,
     "cold_chain_alerts": 7,
     "route_deviation_alerts": 0,
+    "model_alerts": 0,
     "suppressed_spikes": 5,
     "quarantine_by_reason": {
       "GPS_LATITUDE_RANGE": 359,
@@ -28,9 +29,16 @@
   "gold": {
     "dim_shipment": 120,
     "dim_date": 1,
+    "dim_carrier": 6,
+    "dim_warehouse": 5,
+    "dim_route": 8,
+    "dim_vehicle": 40,
     "fact_delivery_performance": 120,
     "fact_cold_chain_excursion": 7,
-    "fact_warehouse_dwell": 120
+    "fact_warehouse_dwell": 120,
+    "fact_hourly_demand": 5,
+    "fact_sensor_trip": 39,
+    "fact_alert": 7
   },
   "kpis": {
     "delivery": {
@@ -92,11 +100,12 @@
       "rule_id": "CC-01",
       "severity": "CRITICAL",
       "start_event_time": "2026-09-22T04:15:00Z",
-      "trigger_event_id": "4df32c97-12c4-4c65-beb0-4fe80e5885c0",
+      "trigger_event_id": "f58277e2-173a-4096-81bc-1f65ab18e3aa",
       "trigger_event_time": "2026-09-22T04:15:30Z",
       "max_temperature": 10.8,
       "readings": 2,
-      "explanation": "temperature above 8.0 C for 2 consecutive readings (30 s), peak 10.8 C"
+      "explanation": "temperature above 8.0 C for 2 consecutive readings (30 s), peak 10.8 C",
+      "trigger_ingest_time": "2026-09-22T04:15:30Z"
     },
     {
       "alert_type": "cold_chain",
@@ -106,11 +115,12 @@
       "rule_id": "CC-01",
       "severity": "CRITICAL",
       "start_event_time": "2026-09-22T04:15:00Z",
-      "trigger_event_id": "bc877812-4498-4534-a7c2-bef36154ab67",
+      "trigger_event_id": "4e80f2f4-61ca-4343-a928-efd417c8e89c",
       "trigger_event_time": "2026-09-22T04:15:30Z",
       "max_temperature": 11.11,
       "readings": 2,
-      "explanation": "temperature above 8.0 C for 2 consecutive readings (30 s), peak 11.1 C"
+      "explanation": "temperature above 8.0 C for 2 consecutive readings (30 s), peak 11.1 C",
+      "trigger_ingest_time": "2026-09-22T04:15:30Z"
     },
     {
       "alert_type": "cold_chain",
@@ -120,16 +130,77 @@
       "rule_id": "CC-01",
       "severity": "CRITICAL",
       "start_event_time": "2026-09-22T04:15:00Z",
-      "trigger_event_id": "11fcf5eb-3dc5-4739-8f7c-d811cf0b28b9",
+      "trigger_event_id": "ac3f3cbf-daa9-4494-9d16-a0e63b61faaf",
       "trigger_event_time": "2026-09-22T04:15:30Z",
       "max_temperature": 10.99,
       "readings": 2,
-      "explanation": "temperature above 8.0 C for 2 consecutive readings (30 s), peak 11.0 C"
+      "explanation": "temperature above 8.0 C for 2 consecutive readings (30 s), peak 11.0 C",
+      "trigger_ingest_time": "2026-09-22T04:15:30Z"
+    },
+    {
+      "alert_type": "cold_chain",
+      "alert_id": "alert-cc-ship-0073-1790050500",
+      "shipment_id": "ship-0073",
+      "sensor_id": "sen-001",
+      "rule_id": "CC-01",
+      "severity": "CRITICAL",
+      "start_event_time": "2026-09-22T04:15:00Z",
+      "trigger_event_id": "1319d32a-4056-47de-952f-f098c60d450a",
+      "trigger_event_time": "2026-09-22T04:15:30Z",
+      "max_temperature": 10.52,
+      "readings": 2,
+      "explanation": "temperature above 8.0 C for 2 consecutive readings (30 s), peak 10.5 C",
+      "trigger_ingest_time": "2026-09-22T04:15:30Z"
+    },
+    {
+      "alert_type": "cold_chain",
+      "alert_id": "alert-cc-ship-0076-1790050500",
+      "shipment_id": "ship-0076",
+      "sensor_id": "sen-004",
+      "rule_id": "CC-01",
+      "severity": "CRITICAL",
+      "start_event_time": "2026-09-22T04:15:00Z",
+      "trigger_event_id": "721bd0fe-b54d-47c3-8f4b-022e635722e0",
+      "trigger_event_time": "2026-09-22T04:15:30Z",
+      "max_temperature": 10.5,
+      "readings": 2,
+      "explanation": "temperature above 8.0 C for 2 consecutive readings (30 s), peak 10.5 C",
+      "trigger_ingest_time": "2026-09-22T04:15:30Z"
+    },
+    {
+      "alert_type": "cold_chain",
+      "alert_id": "alert-cc-ship-0098-1790050500",
+      "shipment_id": "ship-0098",
+      "sensor_id": "sen-002",
+      "rule_id": "CC-01",
+      "severity": "CRITICAL",
+      "start_event_time": "2026-09-22T04:15:00Z",
+      "trigger_event_id": "18bba226-bbe2-4871-bd0b-e94125d2a08e",
+      "trigger_event_time": "2026-09-22T04:15:30Z",
+      "max_temperature": 10.55,
+      "readings": 2,
+      "explanation": "temperature above 8.0 C for 2 consecutive readings (30 s), peak 10.6 C",
+      "trigger_ingest_time": "2026-09-22T04:15:30Z"
+    },
+    {
+      "alert_type": "cold_chain",
+      "alert_id": "alert-cc-ship-0003-1790050500",
+      "shipment_id": "ship-0003",
+      "sensor_id": "sen-003",
+      "rule_id": "CC-01",
+      "severity": "CRITICAL",
+      "start_event_time": "2026-09-22T04:15:00Z",
+      "trigger_event_id": "e04c7419-ba41-4f03-9f9e-bc1a80d8a6bb",
+      "trigger_event_time": "2026-09-22T04:16:00Z",
+      "max_temperature": 11.37,
+      "readings": 2,
+      "explanation": "temperature above 8.0 C for 2 consecutive readings (60 s), peak 11.4 C",
+      "trigger_ingest_time": "2026-09-22T04:16:00Z"
     }
   ],
   "quarantine_sample": [
     {
-      "event_id": "0de4973d-e5af-4105-888d-bda4e60b8e51",
+      "event_id": "ae2c8415-1e7e-4490-be2c-5864d457ee76",
       "event_type": "gps.telemetry",
       "reasons": [
         {
@@ -152,7 +223,7 @@
           "longitude": 73.042837,
           "speed_kph": 36.57
         },
-        "event_id": "0de4973d-e5af-4105-888d-bda4e60b8e51",
+        "event_id": "ae2c8415-1e7e-4490-be2c-5864d457ee76",
         "ingest_time": "2026-09-22T04:10:05Z",
         "schema_version": "1.1",
         "vehicle_id": "veh-027",
@@ -163,13 +234,86 @@
       },
       "arrival_time": "2026-09-22T04:10:05Z",
       "source": "simulator"
+    },
+    {
+      "event_id": "eb1fce95-7bfc-441b-b060-dcab97dbc558",
+      "event_type": "gps.telemetry",
+      "reasons": [
+        {
+          "rule_id": "GPS_LATITUDE_RANGE",
+          "field": "latitude",
+          "observed": 200.0,
+          "expected": "[-90.0, 90.0]",
+          "severity": "ERROR"
+        }
+      ],
+      "reason_codes": [
+        "GPS_LATITUDE_RANGE"
+      ],
+      "raw_payload": {
+        "event_type": "gps.telemetry",
+        "event_time": "2026-09-22T04:10:05Z",
+        "source": "simulator",
+        "payload": {
+          "latitude": 200.0,
+          "longitude": 73.042725,
+          "speed_kph": 57.75
+        },
+        "event_id": "eb1fce95-7bfc-441b-b060-dcab97dbc558",
+        "ingest_time": "2026-09-22T04:10:05Z",
+        "schema_version": "1.1",
+        "vehicle_id": "veh-022",
+        "sensor_id": null,
+        "shipment_id": "ship-0102",
+        "warehouse_id": null,
+        "route_id": "route-006"
+      },
+      "arrival_time": "2026-09-22T04:10:05Z",
+      "source": "simulator"
+    },
+    {
+      "event_id": "f1c0b3cc-9dac-4437-b0d4-5fef18862a24",
+      "event_type": "gps.telemetry",
+      "reasons": [
+        {
+          "rule_id": "GPS_LATITUDE_RANGE",
+          "field": "latitude",
+          "observed": 200.0,
+          "expected": "[-90.0, 90.0]",
+          "severity": "ERROR"
+        }
+      ],
+      "reason_codes": [
+        "GPS_LATITUDE_RANGE"
+      ],
+      "raw_payload": {
+        "event_type": "gps.telemetry",
+        "event_time": "2026-09-22T04:10:15Z",
+        "source": "simulator",
+        "payload": {
+          "latitude": 200.0,
+          "longitude": 73.012588,
+          "speed_kph": 59.36
+        },
+        "event_id": "f1c0b3cc-9dac-4437-b0d4-5fef18862a24",
+        "ingest_time": "2026-09-22T04:10:15Z",
+        "schema_version": "1.1",
+        "vehicle_id": "veh-036",
+        "sensor_id": null,
+        "shipment_id": "ship-0116",
+        "warehouse_id": null,
+        "route_id": "route-004"
+      },
+      "arrival_time": "2026-09-22T04:10:15Z",
+      "source": "simulator"
     }
   ],
   "replay_match": true,
   "sizes": {
-    "bronze_bytes": 1584297,
-    "silver_bytes": 1114340,
-    "gold_bytes": 10052
+    "bronze_bytes": 1584191,
+    "silver_bytes": 1126652,
+    "gold_bytes": 24767
   },
-  "seconds": 6.54
+  "seconds": 2.82,
+  "operational": null
 }

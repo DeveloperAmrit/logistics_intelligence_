@@ -1,0 +1,316 @@
+{
+  "history_dir": "/sessions/rcw-01nnh2vctcwxfztdmhurewcz/mnt/DE_Lab/logistics_intelligence_/data/history",
+  "data_fingerprint": "a865262d6b301e79",
+  "delay": {
+    "holdout_version": "c80755db2a",
+    "final_version": "4be006bcd2",
+    "test_days": [
+      "2026-09-28",
+      "2026-09-29",
+      "2026-09-30",
+      "2026-10-01",
+      "2026-10-02",
+      "2026-10-03",
+      "2026-10-04",
+      "2026-10-05",
+      "2026-10-06",
+      "2026-10-07",
+      "2026-10-08",
+      "2026-10-09",
+      "2026-10-10",
+      "2026-10-11"
+    ],
+    "test_rows": 1590,
+    "late_share": 0.097,
+    "models": [
+      {
+        "model": "promise",
+        "mae_min": 18.9,
+        "rmse_min": 23.12,
+        "auc": 0.5,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "model": "static_eta",
+        "mae_min": 6.76,
+        "rmse_min": 10.23,
+        "auc": 0.747,
+        "precision": 0.868,
+        "recall": 0.214,
+        "f1": 0.344
+      },
+      {
+        "model": "carrier_hour_mean",
+        "mae_min": 9.72,
+        "rmse_min": 17.86,
+        "auc": 0.674,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "model": "linear",
+        "mae_min": 6.72,
+        "rmse_min": 9.66,
+        "auc": 0.811,
+        "precision": 0.739,
+        "recall": 0.221,
+        "f1": 0.34
+      },
+      {
+        "model": "gbt",
+        "mae_min": 5.71,
+        "rmse_min": 8.69,
+        "auc": 0.821,
+        "precision": 0.644,
+        "recall": 0.305,
+        "f1": 0.414
+      }
+    ],
+    "per_day": [
+      {
+        "day": "2026-09-28",
+        "train_rows": 2300,
+        "test_rows": 132,
+        "late": 17,
+        "gbt_mae_min": 5.89
+      },
+      {
+        "day": "2026-09-29",
+        "train_rows": 2432,
+        "test_rows": 123,
+        "late": 11,
+        "gbt_mae_min": 6.21
+      },
+      {
+        "day": "2026-09-30",
+        "train_rows": 2555,
+        "test_rows": 101,
+        "late": 10,
+        "gbt_mae_min": 5.77
+      },
+      {
+        "day": "2026-10-01",
+        "train_rows": 2656,
+        "test_rows": 123,
+        "late": 15,
+        "gbt_mae_min": 5.61
+      },
+      {
+        "day": "2026-10-02",
+        "train_rows": 2779,
+        "test_rows": 145,
+        "late": 17,
+        "gbt_mae_min": 6.39
+      },
+      {
+        "day": "2026-10-03",
+        "train_rows": 2924,
+        "test_rows": 105,
+        "late": 12,
+        "gbt_mae_min": 6.5
+      },
+      {
+        "day": "2026-10-04",
+        "train_rows": 3029,
+        "test_rows": 85,
+        "late": 4,
+        "gbt_mae_min": 4.71
+      },
+      {
+        "day": "2026-10-05",
+        "train_rows": 3114,
+        "test_rows": 151,
+        "late": 11,
+        "gbt_mae_min": 5.06
+      },
+      {
+        "day": "2026-10-06",
+        "train_rows": 3265,
+        "test_rows": 102,
+        "late": 12,
+        "gbt_mae_min": 5.49
+      },
+      {
+        "day": "2026-10-07",
+        "train_rows": 3367,
+        "test_rows": 122,
+        "late": 12,
+        "gbt_mae_min": 4.83
+      },
+      {
+        "day": "2026-10-08",
+        "train_rows": 3489,
+        "test_rows": 128,
+        "late": 9,
+        "gbt_mae_min": 5.57
+      },
+      {
+        "day": "2026-10-09",
+        "train_rows": 3617,
+        "test_rows": 116,
+        "late": 10,
+        "gbt_mae_min": 6.54
+      },
+      {
+        "day": "2026-10-10",
+        "train_rows": 3733,
+        "test_rows": 89,
+        "late": 11,
+        "gbt_mae_min": 6.16
+      },
+      {
+        "day": "2026-10-11",
+        "train_rows": 3822,
+        "test_rows": 68,
+        "late": 3,
+        "gbt_mae_min": 4.8
+      }
+    ],
+    "importance": [
+      {
+        "feature": "processing_min",
+        "auc_drop": 0.2272
+      },
+      {
+        "feature": "carrier",
+        "auc_drop": 0.0573
+      },
+      {
+        "feature": "dispatch_hour_ist",
+        "auc_drop": 0.0531
+      },
+      {
+        "feature": "slack_min",
+        "auc_drop": 0.0206
+      },
+      {
+        "feature": "weekday",
+        "auc_drop": 0.0121
+      },
+      {
+        "feature": "carrier_trips_7d",
+        "auc_drop": 0.0084
+      }
+    ]
+  },
+  "trip_anomaly": {
+    "version": "2a98778b34",
+    "train_trips": 693,
+    "test_trips": 481,
+    "threshold_quantile": 0.95,
+    "by_category": [
+      {
+        "category": "drift (under 8 C)",
+        "trips": 19,
+        "rule_flagged": 0,
+        "model_flagged": 16
+      },
+      {
+        "category": "excursion (over 8 C)",
+        "trips": 6,
+        "rule_flagged": 6,
+        "model_flagged": 6
+      },
+      {
+        "category": "single spikes only",
+        "trips": 71,
+        "rule_flagged": 0,
+        "model_flagged": 3
+      },
+      {
+        "category": "normal",
+        "trips": 385,
+        "rule_flagged": 0,
+        "model_flagged": 0
+      }
+    ],
+    "model_precision": 0.88,
+    "model_recall": 0.88,
+    "rule_recall": 0.24,
+    "combined_recall": 0.88
+  },
+  "dwell_anomaly": {
+    "version": "05c6a28ed5",
+    "test_shipments": 1590,
+    "held_at_dock": 29,
+    "robust_z": {
+      "threshold": 3.5,
+      "flagged": 32,
+      "true_positives": 29,
+      "precision": 0.906,
+      "recall": 1.0
+    },
+    "fixed_60_min": {
+      "threshold": 60.0,
+      "flagged": 29,
+      "true_positives": 29,
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  },
+  "demand_forecast": {
+    "version": "5878e1dfea",
+    "test_days": [
+      "2026-10-05",
+      "2026-10-06",
+      "2026-10-07",
+      "2026-10-08",
+      "2026-10-09",
+      "2026-10-10",
+      "2026-10-11"
+    ],
+    "test_hours": 560,
+    "mean_orders_per_hour": 1.39,
+    "models": [
+      {
+        "model": "seasonal_naive_day",
+        "hourly_wape": 0.86,
+        "hourly_mae": 1.191,
+        "daily_wape": 0.344
+      },
+      {
+        "model": "seasonal_naive_week",
+        "hourly_wape": 0.894,
+        "hourly_mae": 1.239,
+        "daily_wape": 0.214
+      },
+      {
+        "model": "mean_last_3_weeks",
+        "hourly_wape": 0.753,
+        "hourly_mae": 1.043,
+        "daily_wape": 0.169
+      },
+      {
+        "model": "gbt_poisson",
+        "hourly_wape": 0.686,
+        "hourly_mae": 0.951,
+        "daily_wape": 0.196
+      },
+      {
+        "model": "true_rate (floor)",
+        "hourly_wape": 0.651,
+        "hourly_mae": 0.902,
+        "daily_wape": 0.162
+      }
+    ]
+  },
+  "online_parity": {
+    "dispatches_scored_online": 3890,
+    "unscored_creation_missing": 0,
+    "compared_with_batch": 3890,
+    "identical_features": 3887,
+    "different_features": 3,
+    "differing_fields": {
+      "origin_orders_2h": 3
+    },
+    "max_probability_gap_when_identical": 0.0,
+    "test_window_alerts": 75,
+    "test_window_late": 154,
+    "alert_precision": 0.6,
+    "alert_recall": 0.292
+  },
+  "seconds": 26.5
+}

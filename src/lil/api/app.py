@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ..config import load_config
+from ..config import REPO_ROOT, load_config
 from ..storage.lakehouse import Lakehouse
 
 try:
@@ -21,6 +21,7 @@ except ImportError:  # pragma: no cover - optional dependency
 
 CFG = load_config()
 RUNS = CFG.lake_root.parent / "runs"
+HISTORY = CFG.lake_root.parent / "history"
 DASHBOARD = Path(__file__).resolve().parents[3] / "dashboard" / "index.html"
 
 
@@ -42,7 +43,7 @@ def _lake() -> Lakehouse:
 def create_app():
     if FastAPI is None:  # pragma: no cover
         raise RuntimeError("fastapi is not installed; pip install fastapi uvicorn")
-    app = FastAPI(title="Logistics Intelligence Platform", version="0.8.0")
+    app = FastAPI(title="Logistics Intelligence Platform", version="1.0.0")
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
                        allow_headers=["*"])
 
@@ -100,14 +101,67 @@ def create_app():
     @app.get("/api/v1/shipments/{shipment_id}/timeline")
     def timeline(shipment_id: str):
         lake = _lake()
-        rows = lake.query(f"""
+        rows = lake.query("""
             SELECT event_time, new_status FROM silver_shipment_status
-            WHERE shipment_id = '{shipment_id}' ORDER BY event_time
-        """)
+            WHERE shipment_id = ? ORDER BY event_time
+        """, [shipment_id])
         if not rows:
             raise HTTPException(status_code=404, detail="shipment not found")
         return {"shipment_id": shipment_id,
                 "timeline": [{"event_time": str(r[0]), "status": r[1]} for r in rows]}
+
+    # ------------------------------------------------- history and the models
+    def _history_file(name: str) -> Path:
+        path = HISTORY / name
+        if not path.exists():
+            raise HTTPException(status_code=404,
+                                detail=f"{name} not found; run 'make history' and 'make ml'")
+        return path
+
+    @app.get("/api/v1/history/summary")
+    def history_summary():
+        report = json.loads(_history_file("run_report.json").read_text())
+        return {"scenario": report["scenario"], "published": report["published"],
+                "stats": report["stats"], "gold": report["gold"], "kpis": report["kpis"],
+                "sizes": report["sizes"], "seconds": report["seconds"]}
+
+    @app.get("/api/v1/ml/report")
+    def ml_report():
+        return json.loads(_history_file("ml_report.json").read_text())
+
+    @app.get("/api/v1/ml/delay-risk")
+    def delay_risk(limit: int = 15):
+        _history_file("ml_report.json")
+        lake = Lakehouse(HISTORY / "lake")
+        path = HISTORY / "lake" / "ml" / "delay_scores.parquet"
+        rows = lake.query(f"""
+            SELECT s.shipment_id, f.carrier_id, f.origin_warehouse_id, s.p_late,
+                   s.predicted_delay_min, s.actual_delay_min
+            FROM read_parquet('{path}') s JOIN fact_delivery_performance f USING (shipment_id)
+            ORDER BY f.dispatched_at DESC, s.p_late DESC LIMIT ?
+        """, [limit])
+        keys = ("shipment_id", "carrier_id", "origin_warehouse_id", "p_late",
+                "predicted_delay_min", "actual_delay_min")
+        return {"shipments": [dict(zip(keys, r)) for r in rows]}
+
+    @app.get("/api/v1/ml/forecast")
+    def demand_forecast():
+        _history_file("ml_report.json")
+        path = HISTORY / "lake" / "ml" / "demand_forecast_next_day.parquet"
+        rows = Lakehouse(HISTORY / "lake").query(f"""
+            SELECT warehouse_id, round(sum(forecast_orders), 1) AS orders,
+                   arg_max(hour_ist, forecast_orders) AS busiest_hour
+            FROM read_parquet('{path}') GROUP BY warehouse_id ORDER BY warehouse_id
+        """)
+        return {"warehouses": [{"warehouse_id": r[0], "orders": r[1], "busiest_hour": r[2]}
+                               for r in rows]}
+
+    @app.get("/api/v1/models")
+    def models():
+        from ..ml.registry import ModelRegistry
+        root = Path(CFG.get_path("ml.registry", "data/models"))
+        registry = ModelRegistry(root if root.is_absolute() else REPO_ROOT / root)
+        return registry.catalogue()
 
     return app
 

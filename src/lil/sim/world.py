@@ -8,6 +8,7 @@ modelled: the event time stays honest while the release time moves.
 from __future__ import annotations
 
 import random
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 
@@ -20,6 +21,9 @@ STATUS_FLOW = [
 ]
 
 EPOCH = datetime(2026, 9, 22, 4, 0, 0, tzinfo=timezone.utc)  # 09:30 IST
+
+CARRIER_NAMES = ["Marwar Freight", "Thar Logistics", "Mehrangarh Carriers",
+                 "Suncity Transport", "Aravalli Lines", "Rajputana Cold Chain"]
 
 
 @dataclass
@@ -77,6 +81,10 @@ class World:
         self.settings = settings
         self.seed = seed if seed is not None else cfg.get_path("simulation.seed")
         self.rng = random.Random(self.seed)
+        # Event ids come from their own seeded stream: the same seed gives the
+        # same ids, so re-running a scenario is a replay, not new data, and the
+        # main random stream (and every result) is unchanged.
+        self._ids = random.Random(f"{self.seed}-event-ids")
         self.network = RoadNetwork()
         self.master = self._build_master()
         self.gps_interval = cfg.get_path("simulation.gps_interval_seconds")
@@ -102,9 +110,7 @@ class World:
 
         carriers = [
             Carrier(f"car-{i:03d}", f"C{i:02d}", name)
-            for i, name in enumerate(
-                ["Marwar Freight", "Thar Logistics", "Mehrangarh Carriers",
-                 "Suncity Transport", "Aravalli Lines", "Rajputana Cold Chain"], start=1)
+            for i, name in enumerate(CARRIER_NAMES, start=1)
         ]
         vehicles = [
             Vehicle(f"veh-{i:03d}", carriers[i % len(carriers)].carrier_id,
@@ -134,6 +140,9 @@ class World:
                 promised_delivery_time=promised,
             ))
         return MasterData(carriers, vehicles, sensors, routes, shipments)
+
+    def _event_id(self) -> str:
+        return str(uuid.UUID(int=self._ids.getrandbits(128), version=4))
 
     def route_by_id(self, route_id: str) -> Route:
         return next(r for r in self.master.routes if r.route_id == route_id)
@@ -212,6 +221,7 @@ class World:
             self.stats["invalid_emitted"] += 1
         self.stats["gps"] += 1
         return Event(
+            event_id=self._event_id(),
             event_type="gps.telemetry", event_time=now, source="simulator",
             vehicle_id=shipment.vehicle_id, shipment_id=shipment.shipment_id,
             route_id=shipment.route_id,
@@ -243,6 +253,7 @@ class World:
         self.batteries[sensor_id] = max(1.0, self.batteries[sensor_id] - 0.003)
         self.stats["sensor"] += 1
         return Event(
+            event_id=self._event_id(),
             event_type="sensor.reading", event_time=now, source="iot-simulator",
             sensor_id=sensor_id, shipment_id=shipment.shipment_id,
             vehicle_id=shipment.vehicle_id,
@@ -264,6 +275,7 @@ class World:
                             else route.origin_warehouse_id)
             self.stats["warehouse"] += 1
             events.append(Event(
+                event_id=self._event_id(),
                 event_type=warehouse_map[status], event_time=now, source="warehouse-simulator",
                 shipment_id=shipment.shipment_id, warehouse_id=warehouse_id,
                 payload={"scan_type": status.lower()},
@@ -271,6 +283,7 @@ class World:
         previous = STATUS_FLOW[max(STATUS_FLOW.index(status) - 1, 0)]
         self.stats["shipment"] += 1
         events.append(Event(
+            event_id=self._event_id(),
             event_type="shipment.created" if status == "CREATED" else "shipment.status_changed",
             event_time=now, source="postgres", shipment_id=shipment.shipment_id,
             vehicle_id=shipment.vehicle_id, route_id=shipment.route_id,

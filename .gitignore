@@ -6,3 +6,9 @@ data/lake/
 data/runs/
 .pytest_cache/
 *.egg-info/
+data/history/
+data/models/
+data/bench/
+data/checkpoints/
+data/stream_lake/
+.DS_Store
