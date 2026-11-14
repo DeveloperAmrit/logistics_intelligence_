@@ -10,6 +10,8 @@ export PYTHONPATH := src
 .DEFAULT_GOAL := help
 SCENARIO ?= COLD_CHAIN_EXCURSION
 SEED ?= 42
+DAYS ?= 35
+RATES ?= 1000,2000,4000,8000
 
 help:            ## show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -44,6 +46,14 @@ simulate: demo   ## alias for demo
 kpis:            ## print business KPIs from the last run
 	$(PY) -m lil kpis
 
+history:         ## five weeks of operations through the same pipeline (for the models)
+	$(PY) -m lil history --days $(DAYS) --seed $(SEED)
+
+ml:              ## train, evaluate and register the models on the history run
+	$(PY) -m lil ml
+
+all-evidence: test scenarios history ml  ## everything the final report quotes, offline
+
 api:             ## serve the API and dashboard on http://127.0.0.1:8000
 	$(PY) -m uvicorn lil.api.app:app --host 127.0.0.1 --port 8000
 
@@ -73,10 +83,28 @@ topics:          ## create the topics with their keys and retention
 db-migrate:      ## apply the SQL migrations to a running postgres
 	./scripts/migrate.sh
 
+db-counts:       ## row counts and current shipment status in postgres
+	$(PY) -m lil db counts
+
 demo-kafka:      ## run the demo against the real broker (needs make up)
 	$(PY) -m lil demo --scenario $(SCENARIO) --seed $(SEED) --backend kafka
 
-clean:           ## remove generated runs and lake files
-	rm -rf data/runs data/lake data/bus
+demo-postgres:   ## offline demo that also writes the operational store (needs make up)
+	$(PY) -m lil demo --scenario $(SCENARIO) --seed $(SEED) --postgres
 
-.PHONY: help venv setup install install-kafka which-python demo scenarios simulate kpis api test up up-full down reset logs topics db-migrate demo-kafka clean
+stream:          ## the pipeline as a long-running consumer on the broker (Ctrl-C to stop)
+	$(PY) -m lil stream --scenario $(SCENARIO) --seed $(SEED) --lake --postgres
+
+produce:         ## publish a scenario to the broker at RATE events per second
+	$(PY) -m lil produce --scenario $(SCENARIO) --seed $(SEED) $(if $(RATE),--rate $(RATE),)
+
+bench:           ## latency, capacity and crash recovery on the broker (needs make up)
+	$(PY) -m lil bench --rates $(RATES)
+
+test-kafka:      ## the test suite including the broker integration test
+	LIL_KAFKA_TESTS=1 $(PY) -m pytest tests -q
+
+clean:           ## remove generated runs, history, models and lake files
+	rm -rf data/runs data/lake data/bus data/history data/models data/bench data/checkpoints data/stream_lake
+
+.PHONY: help venv setup install install-kafka which-python demo scenarios simulate kpis history ml all-evidence api test test-kafka up up-full down reset logs topics db-migrate db-counts demo-kafka demo-postgres stream produce bench clean

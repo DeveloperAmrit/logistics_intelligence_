@@ -106,6 +106,7 @@ def _execute(world, name: str, seed: int, cfg: Config, backend: str, run_dir: Pa
                         scorers=scorers)
     stats = pipeline.run_topics(
         [topics["gps"], topics["sensor"], topics["warehouse"], topics["shipment"]])
+    bus.flush()  # alerts and DLQ records the pipeline published must reach the broker
 
     lake = Lakehouse(lake_dir)
     lake.write_reference(world.master)

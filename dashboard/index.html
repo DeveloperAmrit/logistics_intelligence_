@@ -1,168 +1,1357 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Logistics Intelligence Platform</title>
+<title>Logistics Intelligence · Operations</title>
 <style>
-  :root { --ink:#111113; --soft:#5b5b61; --mute:#8e8e94; --line:#d9d9dd; --tint:#f4f4f5; --acc:#c4341c; }
-  * { box-sizing:border-box; }
-  body { margin:0; background:#fff; color:var(--ink);
-         font:14px/1.5 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
-  .wrap { max-width:1100px; margin:0 auto; padding:32px 20px 64px; }
-  .kicker { font-family:ui-monospace, "Courier New", monospace; font-size:11px;
-            letter-spacing:1.6px; color:var(--mute); }
-  h1 { font-size:28px; margin:8px 0 4px; letter-spacing:-0.2px; }
-  .lede { color:var(--soft); margin:0 0 24px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; }
-  .card { border:1px solid var(--line); border-radius:8px; padding:14px 16px; }
-  .card.tint { background:var(--tint); }
-  .big { font-size:26px; font-weight:700; }
-  .lab { font-size:12px; color:var(--soft); }
-  .sub { font-family:ui-monospace,"Courier New",monospace; font-size:10px; color:var(--mute);
-         letter-spacing:0.6px; margin-top:4px; }
-  h2 { font-size:16px; margin:32px 0 10px; }
-  table { width:100%; border-collapse:collapse; font-size:13px; }
-  th { text-align:left; font-family:ui-monospace,"Courier New",monospace; font-size:10px;
-       letter-spacing:1px; color:var(--mute); font-weight:400; padding:0 8px 6px 0;
-       border-bottom:1px solid var(--ink); }
-  td { padding:7px 8px 7px 0; border-bottom:1px solid var(--line); vertical-align:top; }
-  .mono { font-family:ui-monospace,"Courier New",monospace; font-size:12px; }
-  .acc { color:var(--acc); font-weight:700; }
-  .empty { color:var(--mute); padding:14px 0; }
-  @media (prefers-color-scheme: dark) {
-    :root { --ink:#f2f2f3; --soft:#b3b3ba; --mute:#8e8e94; --line:#2c2c31; --tint:#191a1d; }
-    body { background:#111113; }
-  }
+:root{
+  --bg:#eef2f6; --panel:#ffffff; --panel2:#f6f8fb; --ink:#13293d; --soft:#4a5d70; --mute:#8696a7;
+  --line:#dde5ed; --side:#13293d; --side2:#1b3a55; --sideink:#c9d6e2;
+  --teal:#1b998b; --amber:#f4a259; --red:#d0505a; --sky:#5fa8d3; --slate:#8aa1b1; --violet:#8b7fd6; --navy:#1b4965;
+  --gps:#5fa8d3; --sensor:#1b998b; --wh:#8b7fd6; --status:#e0a84a;
+  --shadow:0 1px 2px rgba(19,41,61,.06),0 4px 14px rgba(19,41,61,.06);
+  --radius:12px; --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+}
+[data-theme=dark]{
+  --bg:#0c1722; --panel:#122130; --panel2:#0f1c29; --ink:#e6eef5; --soft:#a9bccd; --mute:#6f879c;
+  --line:#21364a; --side:#08111a; --side2:#122130; --sideink:#9fb3c6;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:13.5px/1.45 Inter,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;overflow:hidden}
+button,select,input{font:inherit;color:inherit}
+/* ---------- sidebar ---------- */
+#side{width:228px;flex:none;background:var(--side);color:var(--sideink);display:flex;flex-direction:column;padding:18px 12px}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 18px}
+.brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--teal),var(--sky));display:grid;place-items:center;color:#fff;font-weight:800}
+.brand b{color:#fff;display:block;font-size:14px;letter-spacing:.2px}
+.brand small{font-size:11px;color:#7f98ad}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:var(--sideink);font-size:13.5px}
+.nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav button.on{background:var(--side2);color:#fff;box-shadow:inset 3px 0 0 var(--teal)}
+.nav svg{width:17px;height:17px;flex:none;opacity:.9}
+.nav .live{margin-left:auto;font-size:9.5px;font-weight:700;letter-spacing:.8px;background:var(--red);color:#fff;padding:1px 6px;border-radius:20px}
+.side-foot{margin-top:auto;font-size:11px;color:#6f879c;padding:8px;line-height:1.6}
+.side-foot .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:6px;box-shadow:0 0 0 3px rgba(27,153,139,.25)}
+/* ---------- main ---------- */
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+header{display:flex;align-items:center;gap:14px;padding:14px 26px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.2px}
+header .crumb{color:var(--mute);font-size:12px}
+header .sp{flex:1}
+.ctl{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:5px 10px}
+.ctl label{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.7px}
+.ctl select{border:0;background:transparent;font-weight:600;outline:none;cursor:pointer}
+.ctl select option{color:#13293d}
+.ibtn{all:unset;cursor:pointer;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel2)}
+.ibtn:hover{border-color:var(--teal)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--panel2);border:1px solid var(--line);color:var(--soft);white-space:nowrap}
+.chip.ok{color:var(--teal);border-color:rgba(27,153,139,.35);background:rgba(27,153,139,.08)}
+.chip.bad{color:var(--red);border-color:rgba(208,80,90,.35);background:rgba(208,80,90,.08)}
+.chip.warn{color:#c47a22;border-color:rgba(244,162,89,.45);background:rgba(244,162,89,.10)}
+#content{flex:1;overflow:auto;padding:22px 26px 40px}
+.page{display:none;animation:fade .25s ease}
+.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.grid{display:grid;gap:16px}
+.g12{grid-template-columns:repeat(12,minmax(0,1fr))}
+.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s9{grid-column:span 9}.s12{grid-column:span 12}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;min-width:0}
+.card h3{margin:0 0 2px;font-size:14px;font-weight:700}
+.card .hint{font-size:12px;color:var(--mute);margin:0 0 10px}
+.card .head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.card .head .sp{flex:1}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:14px;margin-bottom:16px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;position:relative;overflow:hidden}
+.kpi .l{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .v{font-size:23px;white-space:nowrap;font-weight:750;margin-top:4px;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:12px;color:var(--soft);margin-top:2px}
+.kpi .bar{position:absolute;left:0;top:0;bottom:0;width:4px}
+.kpi canvas,.kpi svg.spark{position:absolute;right:10px;bottom:10px;opacity:.9}
+table.t{width:100%;border-collapse:collapse;font-size:12.8px}
+table.t th{text-align:left;font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--mute);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);cursor:pointer;white-space:nowrap}
+table.t td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.t tr.click{cursor:pointer}
+table.t tr.click:hover td{background:var(--panel2)}
+table.t td.num,table.t th.num{text-align:right;font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:12px}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px}
+.p-crit{background:rgba(208,80,90,.14);color:var(--red)}
+.p-warn{background:rgba(244,162,89,.18);color:#c47a22}
+.p-ok{background:rgba(27,153,139,.14);color:var(--teal)}
+.p-info{background:rgba(95,168,211,.16);color:#3a87b4}
+.p-mute{background:var(--panel2);color:var(--soft);border:1px solid var(--line)}
+.scroll{max-height:360px;overflow:auto}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel2)}
+.seg button{all:unset;cursor:pointer;padding:5px 11px;font-size:12px;color:var(--soft)}
+.seg button.on{background:var(--teal);color:#fff}
+.search{border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:6px 10px;min-width:200px;outline:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--soft)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.empty{color:var(--mute);padding:26px;text-align:center}
+#tip{position:fixed;pointer-events:none;z-index:50;background:#0e1d2b;color:#e6eef5;font-size:12px;padding:8px 10px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .1s;max-width:300px;line-height:1.5}
+#tip b{color:#fff}
+svg text{fill:var(--soft);font-size:11px}
+svg .axis line,svg .axis path{stroke:var(--line)}
+svg .grid line{stroke:var(--line);stroke-dasharray:2 3}
+/* ---------- live ---------- */
+.livebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:9px;border:1px solid var(--line);background:var(--panel);font-weight:600;font-size:12.5px;box-shadow:var(--shadow)}
+.btn:hover{border-color:var(--teal)}
+.btn.pri{background:var(--teal);color:#fff;border-color:var(--teal)}
+.btn.red{background:var(--red);color:#fff;border-color:var(--red)}
+.toggle{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--soft);cursor:pointer;user-select:none}
+.toggle input{accent-color:var(--teal)}
+#lv-caption{display:flex;align-items:center;gap:12px;background:#0e1d2b;color:#e6eef5;border-radius:10px;padding:10px 14px;margin-top:10px;min-height:48px;font-size:14px;line-height:1.4}
+#lv-caption b{color:#fff}#lv-caption .mono{color:#f4c38a}
+#lv-caption .cap-n{flex:none;min-width:30px;height:30px;padding:0 8px;border-radius:15px;background:var(--teal);display:grid;place-items:center;font-weight:800;font-size:12px;color:#fff}
+#lv-caption.fail .cap-n{background:var(--red)}#lv-caption.warn .cap-n{background:var(--amber)}
+#pipe{width:100%;display:block;background:radial-gradient(circle at 1px 1px,var(--line) 1px,transparent 0) 0 0/18px 18px;border-radius:10px}
+#pipe .node rect{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
+#pipe .node.hot rect{stroke:var(--teal);stroke-width:2.2}
+#pipe .node.fail rect{stroke:var(--red);stroke-width:2.2}
+#pipe .node .t{font-size:12.5px;font-weight:700;fill:var(--ink)}
+#pipe .node .s{font-size:10px;fill:var(--mute)}
+#pipe .node .c{font-size:15px;font-weight:750;fill:var(--ink);font-variant-numeric:tabular-nums}
+#pipe .wire{stroke:var(--line);stroke-width:2;fill:none}
+#pipe .wire.dash{stroke-dasharray:5 5}
+#pipe .cell{fill:var(--panel2);stroke:var(--line)}
+#pipe .cell.flash{fill:var(--teal);transition:fill .1s}
+#pipe .grp{fill:none;stroke:var(--teal);stroke-dasharray:6 6;stroke-width:1.2;opacity:.55}
+.progress{height:6px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);position:relative;cursor:pointer;flex:1;min-width:160px}
+.progress i{position:absolute;left:0;top:0;bottom:0;background:var(--teal);border-radius:6px}
+.progress b{position:absolute;top:-4px;width:3px;height:14px;background:var(--red);border-radius:2px}
+.clock{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.clock div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.clock .l{font-size:10.5px;color:var(--mute);text-transform:uppercase;letter-spacing:.6px}
+.clock .v{font-family:var(--mono);font-size:15px;font-weight:700;margin-top:2px}
+.steps{list-style:none;margin:0;padding:0}
+.steps li{display:grid;grid-template-columns:26px 1fr;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);opacity:.38;transition:opacity .25s}
+.steps li.done,.steps li.act{opacity:1}
+.steps li .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;background:var(--panel2);border:1px solid var(--line)}
+.steps li.done .n{background:var(--teal);color:#fff;border-color:var(--teal)}
+.steps li.fail .n{background:var(--red);color:#fff;border-color:var(--red)}
+.steps li.warn .n{background:var(--amber);color:#fff;border-color:var(--amber)}
+.steps li.act .n{box-shadow:0 0 0 4px rgba(27,153,139,.25)}
+.steps li b{font-size:12.5px}
+.steps li .x{font-size:12px;color:var(--soft)}
+.steps li ul{margin:3px 0 0;padding-left:16px;font-size:11.5px;color:var(--soft)}
+pre.json{margin:0;font-family:var(--mono);font-size:11.3px;line-height:1.5;background:#0e1d2b;color:#cfe0ee;border-radius:10px;padding:10px 12px;overflow:auto;max-height:220px}
+pre.json .k{color:#7fc3e8}pre.json .s{color:#f4c38a}pre.json .n{color:#7ee0c3}
+.ticker{font-size:12px}
+.ticker div{display:grid;grid-template-columns:58px 70px 1fr auto;gap:8px;padding:5px 6px;border-bottom:1px solid var(--line);cursor:pointer;align-items:center;animation:slide .3s ease}
+.ticker div:hover{background:var(--panel2)}
+@keyframes slide{from{opacity:0;transform:translateX(-6px)}to{opacity:1}}
+#toasts{position:fixed;top:72px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:60}
+.toast{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--red);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:10px 14px;min-width:290px;max-width:360px;animation:pop .3s ease}
+.toast b{display:block;font-size:13px}
+.toast span{font-size:12px;color:var(--soft)}
+@keyframes pop{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+/* ---------- drawer ---------- */
+#scrim{position:fixed;inset:0;background:rgba(8,17,26,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:70}
+#scrim.on{opacity:1;pointer-events:auto}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(720px,94vw);background:var(--bg);z-index:80;transform:translateX(102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);overflow:auto;padding:22px 24px 40px;box-shadow:-20px 0 50px rgba(0,0,0,.2)}
+#drawer.on{transform:none}
+.timeline{display:flex;gap:0;margin:6px 0 4px;overflow-x:auto}
+.timeline div{flex:1;min-width:92px;text-align:center;position:relative;padding-top:20px;font-size:11.5px}
+.timeline div:before{content:"";position:absolute;top:6px;left:0;right:0;height:3px;background:var(--teal);opacity:.35}
+.timeline div:after{content:"";position:absolute;top:1px;left:50%;margin-left:-6px;width:12px;height:12px;border-radius:50%;background:var(--teal);border:2px solid var(--panel)}
+.timeline div b{display:block;font-size:11px}
+.timeline div span{color:var(--mute);font-family:var(--mono);font-size:10.5px}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0}
+.facts div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.facts .l{font-size:10.5px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px}
+.facts .v{font-weight:700;margin-top:2px}
+.mapwrap{position:relative}
+#fleetmap{width:100%;display:block;border-radius:10px;background:var(--panel2)}
+#fleetmap .road{stroke:var(--slate);stroke-width:5;stroke-linecap:round;opacity:.28}
+#fleetmap .road2{stroke:var(--panel);stroke-width:1.5;stroke-dasharray:4 6;opacity:.8}
+.veh{cursor:pointer}
+.pulse{animation:pulse 1.4s infinite}
+@keyframes pulse{0%{r:6;opacity:.8}100%{r:20;opacity:0}}
+.bigclock{font-family:var(--mono);font-size:28px;font-weight:750;letter-spacing:-.5px}
+input[type=range]{accent-color:var(--teal);width:100%}
+.stat-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.stat-row b{font-variant-numeric:tabular-nums}
+@media (max-width:1200px){.s3{grid-column:span 6}.s4,.s5,.s7,.s8{grid-column:span 12}.s6{grid-column:span 12}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="kicker">LIVE OPERATIONS · GROUP 16</div>
-  <h1>Logistics Intelligence Platform</h1>
-  <p class="lede" id="lede">Loading the latest run…</p>
+<nav id="side">
+  <div class="brand"><div class="logo">LI</div><div><b>Logistics Intelligence</b><small>Group 16 · Jodhpur network</small></div></div>
+  <div class="nav" id="nav"></div>
+  <div class="side-foot"><span class="dot" id="apidot"></span><span id="apitext">connecting…</span><br>FastAPI · DuckDB · Parquet<br>Kafka 3.9 semantics</div>
+</nav>
+<div id="main">
+  <header>
+    <div><div class="crumb" id="crumb">Operations</div><h1 id="title">Overview</h1></div>
+    <div class="sp"></div>
+    <span class="chip" id="hdr-replay">replay —</span>
+    <span class="chip" id="hdr-seed">seed —</span>
+    <div class="ctl"><label>Scenario</label><select id="runsel"></select></div>
+    <button class="ibtn" id="refresh" title="Reload data"><svg viewBox="0 0 24 24" width="17" height="17"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button class="ibtn" id="theme" title="Light / dark"><svg viewBox="0 0 24 24" width="17" height="17"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+  </header>
+  <div id="content">
 
-  <div class="grid" id="tiles"></div>
+    <!-- ===================== OVERVIEW ===================== -->
+    <section class="page" id="pg-overview">
+      <div class="kpis" id="ov-kpis"></div>
+      <div class="grid g12">
+        <div class="card s8">
+          <div class="head"><div><h3>Event throughput</h3><p class="hint">Valid events per minute of event time, by stream. Red ticks: quarantined; triangles: alerts.</p></div><div class="sp"></div><div class="legend" id="tp-legend"></div></div>
+          <div id="ov-throughput"></div>
+        </div>
+        <div class="card s4">
+          <h3>Processing funnel</h3><p class="hint">What happened to every published event.</p>
+          <div id="ov-funnel"></div>
+        </div>
+        <div class="card s4">
+          <h3>Event mix</h3><p class="hint">Valid events by stream.</p>
+          <div id="ov-mix"></div>
+        </div>
+        <div class="card s4">
+          <h3>OTIF by carrier</h3><p class="hint">Click a bar for that carrier's shipments.</p>
+          <div id="ov-carriers"></div>
+        </div>
+        <div class="card s4">
+          <div class="head"><div><h3>Latest alerts</h3><p class="hint">Click to open the shipment.</p></div><div class="sp"></div><button class="btn" onclick="go('alerts')">All alerts →</button></div>
+          <div id="ov-alerts"></div>
+        </div>
+      </div>
+    </section>
 
-  <h2>Active alerts</h2>
-  <div id="alerts"><p class="empty">Loading…</p></div>
+    <!-- ===================== LIVE ===================== -->
+    <section class="page" id="pg-live">
+      <div class="livebar">
+        <button class="btn pri" id="lv-play">▶ Play</button>
+        <button class="btn" id="lv-restart">↺ Restart</button>
+        <button class="btn red" id="lv-jump">⚑ Jump to first alert</button>
+        <button class="btn" id="lv-explain">🔍 Explain next event</button>
+        <div class="seg" id="lv-speed"></div>
+        <label class="toggle"><input type="checkbox" id="lv-auto" checked> Pause and explain notable events</label>
+        <div class="progress" id="lv-prog"><i></i></div>
+        <span class="chip" id="lv-pos">0 / 0</span>
+      </div>
+      <div class="grid g12">
+        <div class="card s12">
+          <div class="head"><div style="max-width:760px"><h3>The stream, replayed event by event</h3><p class="hint" id="lv-hint">Every dot is a real event from this run's Kafka topics, sent through a fresh copy of the real pipeline. Its route shows what each stage decided.</p></div><div class="sp"></div>
+            <div class="clock" style="min-width:470px">
+              <div><div class="l">Event time</div><div class="v" id="ck-et">—</div></div>
+              <div><div class="l">Watermark</div><div class="v" id="ck-wm">—</div></div>
+              <div><div class="l">Events / s</div><div class="v" id="ck-eps">0</div></div>
+              <div><div class="l">Alerts</div><div class="v" id="ck-al" style="color:var(--red)">0</div></div>
+            </div></div>
+          <svg id="pipe" viewBox="0 0 1200 440"></svg>
+          <div id="lv-caption"><span class="cap-n" id="lv-cap-n">▶</span><span id="lv-cap-text">Press <b>Play</b> to stream this run through the pipeline, or <b>Jump to first alert</b>.</span></div>
+          <div class="legend" style="margin-top:8px">
+            <span><i style="background:var(--gps)"></i>GPS</span><span><i style="background:var(--sensor)"></i>Reefer sensor</span><span><i style="background:var(--wh)"></i>Warehouse scan</span><span><i style="background:var(--status)"></i>Shipment status</span>
+            <span><i style="background:var(--red)"></i>Quarantined / alert</span><span><i style="background:var(--amber)"></i>Late, off corridor or above 8 °C</span><span><i style="background:#9aa7b4"></i>Duplicate</span>
+            <span style="margin-left:auto">The watermark trails the newest event time by 60 s.</span>
+          </div>
+        </div>
+        <div class="card s5" style="display:flex;flex-direction:column;gap:10px">
+          <div class="head" style="margin:0"><div><h3>Event inspector</h3><p class="hint" style="margin:0" id="ins-sub">Click any dot or log row, or use “Explain next event”.</p></div><div class="sp"></div><span id="ins-chip"></span></div>
+          <ol class="steps" id="ins-steps"></ol>
+          <pre class="json" id="ins-json">{ }</pre>
+        </div>
+        <div class="card s4">
+          <h3>Reefer watch</h3><p class="hint">Cold-chain (2–8 °C) readings as they arrive. A dot above the red line is a breach; two in a row is an alert.</p>
+          <div id="lv-reefer"></div>
+        </div>
+        <div class="card s3">
+          <h3>Event log</h3><p class="hint">Newest first. Click a row to inspect it.</p>
+          <div class="ticker scroll" id="lv-log" style="max-height:420px"></div>
+        </div>
+      </div>
+    </section>
 
-  <h2>Carrier performance</h2>
-  <div id="carriers"><p class="empty">Loading…</p></div>
+    <!-- ===================== FLEET ===================== -->
+    <section class="page" id="pg-fleet">
+      <div class="grid g12">
+        <div class="card s9">
+          <div class="head"><div><h3>Fleet on the Jodhpur network</h3><p class="hint">Every vehicle's GPS track from Silver, replayed against event time. Click a vehicle for its shipment.</p></div><div class="sp"></div>
+            <button class="btn pri" id="fl-play">▶ Play</button><div class="seg" id="fl-speed"></div></div>
+          <div class="mapwrap"><svg id="fleetmap" viewBox="0 0 1000 620"></svg></div>
+          <input type="range" id="fl-slider" min="0" max="1000" value="0" style="margin-top:10px">
+          <div class="legend" style="margin-top:6px"><span><i style="background:var(--teal)"></i>Reefer (2–8 °C) load</span><span><i style="background:var(--navy)"></i>Ambient load</span><span><i style="background:var(--red)"></i>Cold-chain alert raised</span><span><i style="background:var(--amber)"></i>Route deviation</span><span><i style="background:#fff;border:2px solid var(--violet)"></i>Warehouse</span></div>
+        </div>
+        <div class="card s3">
+          <div class="l" style="font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.6px">Event time</div>
+          <div class="bigclock" id="fl-clock">--:--:--</div>
+          <div style="margin-top:12px" id="fl-stats"></div>
+          <h3 style="margin-top:16px">Alerts so far</h3>
+          <div id="fl-alerts" class="scroll" style="max-height:300px"></div>
+        </div>
+      </div>
+    </section>
 
-  <h2>Data quality — quarantined records</h2>
-  <div id="dq"><p class="empty">Loading…</p></div>
+    <!-- ===================== ALERTS ===================== -->
+    <section class="page" id="pg-alerts">
+      <div class="kpis" id="al-kpis"></div>
+      <div class="card">
+        <div class="head"><div><h3>All alerts in this run</h3><p class="hint">Each alert explains itself and keeps the event that triggered it. Click a row for the shipment.</p></div><div class="sp"></div>
+          <div class="filters"><div class="seg" id="al-type"></div><input class="search" id="al-q" placeholder="Search shipment, vehicle, rule…"></div></div>
+        <div id="al-table" class="scroll" style="max-height:none"></div>
+      </div>
+    </section>
 
-  <div class="kicker" style="margin-top:44px">HISTORY · MODELS</div>
-  <p class="lede" id="hist-lede">Loading the history run…</p>
-  <div class="grid" id="ml-tiles"></div>
+    <!-- ===================== CARRIERS ===================== -->
+    <section class="page" id="pg-carriers">
+      <div class="kpis" id="ca-kpis"></div>
+      <div class="grid g12">
+        <div class="card s5"><h3>OTIF by carrier</h3><p class="hint">Click to filter the delay distribution.</p><div id="ca-bar"></div></div>
+        <div class="card s7"><div class="head"><div><h3>Delivery delay distribution</h3><p class="hint" id="ca-hhint">Actual minus promised arrival, all delivered shipments.</p></div><div class="sp"></div><button class="btn" id="ca-clear">Show all carriers</button></div><div id="ca-hist"></div></div>
+        <div class="card s12"><h3>Carrier scorecard</h3><p class="hint">Sort by clicking a column.</p><div id="ca-table"></div></div>
+        <div class="card s12"><div class="head"><div><h3>Shipments</h3><p class="hint" id="ca-shint">Delivered shipments. Click one to open it.</p></div></div><div id="ca-ship" class="scroll" style="max-height:380px"></div></div>
+      </div>
+    </section>
 
-  <h2>Delay risk at dispatch — latest shipments</h2>
-  <div id="risk"><p class="empty">Loading…</p></div>
+    <!-- ===================== DATA QUALITY ===================== -->
+    <section class="page" id="pg-quality">
+      <div class="kpis" id="dq-kpis"></div>
+      <div class="grid g12">
+        <div class="card s4"><h3>Quarantine by reason</h3><p class="hint">Every rejection keeps its reason code and raw payload.</p><div id="dq-donut"></div></div>
+        <div class="card s8"><h3>Lateness and duplicates</h3><p class="hint">How the event-time stage classified the valid events.</p><div id="dq-late"></div><div id="dq-rules" style="margin-top:14px"></div></div>
+        <div class="card s12"><h3>Quarantined records (sample)</h3><p class="hint">Click a row to see the payload exactly as it arrived.</p><div id="dq-table" class="scroll" style="max-height:420px"></div></div>
+      </div>
+    </section>
 
-  <h2>Reefer trips the 8 °C rule cannot see</h2>
-  <div id="trips"><p class="empty">Loading…</p></div>
+    <!-- ===================== MODELS ===================== -->
+    <section class="page" id="pg-models">
+      <div class="kpis" id="ml-kpis"></div>
+      <div class="grid g12">
+        <div class="card s6"><h3>Delay at dispatch: error by model</h3><p class="hint">Mean absolute error in minutes over a 14-day rolling origin. Lower is better.</p><div id="ml-mae"></div></div>
+        <div class="card s6"><h3>Daily error of the gradient-boosting model</h3><p class="hint">Retrained before each test day.</p><div id="ml-daily"></div></div>
+        <div class="card s6"><h3>What drives the delay prediction</h3><p class="hint">Drop in AUC when the feature is shuffled.</p><div id="ml-imp"></div></div>
+        <div class="card s6"><h3>Reefer trips: rule vs model</h3><p class="hint">Flags per trip category on the test window.</p><div id="ml-trip"></div></div>
+        <div class="card s7"><div class="head"><div><h3>Tomorrow's orders by warehouse and hour</h3><p class="hint">Day-ahead Poisson gradient-boosting forecast. Click a legend entry to toggle a warehouse.</p></div></div><div id="ml-fc"></div><div class="legend" id="ml-fc-leg" style="margin-top:6px;cursor:pointer"></div></div>
+        <div class="card s5"><h3>Delay risk at dispatch: latest shipments</h3><p class="hint">P(late) from the online scorer, against what happened.</p><div id="ml-risk" class="scroll" style="max-height:330px"></div></div>
+      </div>
+    </section>
 
-  <h2>Tomorrow's orders by warehouse</h2>
-  <div id="forecast"><p class="empty">Loading…</p></div>
+    <!-- ===================== SCENARIOS ===================== -->
+    <section class="page" id="pg-scenarios">
+      <div class="card">
+        <h3>Seven fault scenarios, one seed</h3><p class="hint">Each row is a full run of the same simulated hour with one fault injected. Click a row to open that run.</p>
+        <div id="sc-table"></div>
+      </div>
+      <div class="grid g12" style="margin-top:16px">
+        <div class="card s6"><h3>What each scenario changed</h3><p class="hint">Duplicates removed + late events handled + alerts raised, per run. Hover for the split.</p><div id="sc-chart"></div></div>
+        <div class="card s6"><h3>OTIF and quarantine per run</h3><p class="hint">Delivery KPIs stay comparable across faults.</p><div id="sc-chart2"></div></div>
+      </div>
+    </section>
+  </div>
 </div>
+
+<div id="tip"></div>
+<div id="toasts"></div>
+<div id="scrim"></div>
+<aside id="drawer"></aside>
+
 <script>
-const api = p => fetch(p).then(r => r.ok ? r.json() : Promise.reject(r.status));
-const tile = (big, lab, sub, acc) =>
-  `<div class="card${acc ? " tint" : ""}"><div class="big${acc ? " acc" : ""}">${big}</div>
-   <div class="lab">${lab}</div><div class="sub">${sub}</div></div>`;
+"use strict";
+/* =====================================================================
+   Small utilities
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const fmt = n => n == null ? "—" : Number(n).toLocaleString("en-US");
+const fmt1 = n => n == null ? "—" : Number(n).toFixed(1);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const hhmmss = s => (s || "").replace("T", " ").slice(11, 19);
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function svg(container, w, h) {
+  container.innerHTML = "";
+  const s = el("svg", { viewBox: `0 0 ${w} ${h}`, width: "100%" });
+  container.appendChild(s);
+  return s;
+}
+const tip = {
+  node: null,
+  show(e, html) { this.node = this.node || $("#tip"); this.node.innerHTML = html; this.node.style.opacity = 1; this.move(e); },
+  move(e) { const t = this.node; if (!t) return; const x = Math.min(e.clientX + 14, innerWidth - t.offsetWidth - 10); t.style.left = x + "px"; t.style.top = (e.clientY + 14) + "px"; },
+  hide() { if (this.node) this.node.style.opacity = 0; }
+};
+function hover(node, html) {
+  node.addEventListener("mousemove", e => tip.show(e, typeof html === "function" ? html() : html));
+  node.addEventListener("mouseleave", () => tip.hide());
+}
+function countUp(node, to, opts = {}) {
+  const dec = opts.dec || 0, suf = opts.suf || "", dur = 700, t0 = performance.now();
+  if (to == null || isNaN(to)) { node.textContent = "—"; return; }
+  const step = t => {
+    const k = Math.min(1, (t - t0) / dur), v = to * (1 - Math.pow(1 - k, 3));
+    node.textContent = (dec ? v.toFixed(dec) : Math.round(v).toLocaleString("en-US")) + suf;
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+function kpiRow(container, items) {
+  container.innerHTML = items.map((k, i) => `<div class="kpi"><div class="bar" style="background:${k.color || "var(--teal)"}"></div>
+    <div class="l">${k.label}</div><div class="v" id="${container.id}-${i}" style="color:${k.vcolor || "var(--ink)"}">—</div><div class="d">${k.sub || ""}</div></div>`).join("");
+  items.forEach((k, i) => countUp($(`#${container.id}-${i}`), k.value, k));
+}
+function toast(title, body, color) {
+  const t = document.createElement("div");
+  t.className = "toast";
+  if (color) t.style.borderLeftColor = color;
+  t.innerHTML = `<b>${title}</b><span>${body}</span>`;
+  $("#toasts").appendChild(t);
+  while ($("#toasts").children.length > 3) $("#toasts").firstChild.remove();
+  setTimeout(() => { t.style.transition = "opacity .4s"; t.style.opacity = 0; setTimeout(() => t.remove(), 450); }, 4200);
+}
+function table(container, cols, rows, opts = {}) {
+  let sortKey = opts.sort, dir = opts.dir || -1;
+  const draw = () => {
+    const data = rows.slice();
+    if (sortKey) data.sort((a, b) => { const x = a[sortKey], y = b[sortKey]; return (x > y ? 1 : x < y ? -1 : 0) * dir; });
+    container.innerHTML = `<table class="t"><thead><tr>${cols.map(c => `<th class="${c.num ? "num" : ""}" data-k="${c.key}">${c.label}${sortKey === c.key ? (dir > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}</tr></thead>
+      <tbody>${data.length ? data.map((r, i) => `<tr class="${opts.onClick ? "click" : ""}" data-i="${rows.indexOf(r)}">${cols.map(c => `<td class="${c.num ? "num" : ""} ${c.mono ? "mono" : ""}">${c.render ? c.render(r) : esc(r[c.key])}</td>`).join("")}</tr>`).join("")
+        : `<tr><td colspan="${cols.length}" class="empty">Nothing to show for this run.</td></tr>`}</tbody></table>`;
+    container.querySelectorAll("th").forEach(th => th.onclick = () => { const k = th.dataset.k; dir = sortKey === k ? -dir : -1; sortKey = k; draw(); });
+    if (opts.onClick) container.querySelectorAll("tbody tr[data-i]").forEach(tr => tr.onclick = () => opts.onClick(rows[+tr.dataset.i]));
+  };
+  draw();
+}
+function prettyJson(obj) {
+  return esc(JSON.stringify(obj, null, 2))
+    .replace(/&quot;([^&]+?)&quot;:/g, '<span class="k">"$1"</span>:')
+    .replace(/: &quot;(.*?)&quot;/g, ': <span class="s">"$1"</span>')
+    .replace(/: (-?\d+\.?\d*)/g, ': <span class="n">$1</span>');
+}
 
-async function load() {
-  try {
-    const run = await api('/api/v1/run');
-    const s = run.stats;
-    document.getElementById('lede').textContent =
-      `Scenario ${run.scenario}, seed ${run.seed}, ${run.published.toLocaleString()} events published in ${run.seconds}s.`;
-    document.getElementById('tiles').innerHTML = [
-      tile(s.valid.toLocaleString(), 'valid events processed', 'AFTER VALIDATION AND DEDUP'),
-      tile(s.cold_chain_alerts + s.route_deviation_alerts, 'alerts raised',
-           `${s.suppressed_spikes} NOISE SPIKES SUPPRESSED`, true),
-      tile(s.quarantined.toLocaleString(), 'records quarantined', 'REASON AND PAYLOAD KEPT'),
-      tile(s.duplicates.toLocaleString(), 'duplicates suppressed', 'DEDUPLICATED ON EVENT_ID'),
-      tile(s.late_side_output.toLocaleString(), 'events past the lateness window', 'ROUTED TO SIDE OUTPUT'),
-      tile(run.replay_match ? 'match' : 'MISMATCH', 'replay from offset zero', 'RECORD COUNTS COMPARED')
-    ].join('');
+/* =====================================================================
+   Charts (hand-written SVG, no external libraries, works offline)
+   ===================================================================== */
+function barH(container, items, o = {}) {
+  const w = container.clientWidth || 520, row = o.row || 30, lab = o.labelW || 140, h = items.length * row + 8;
+  const s = svg(container, w, h), max = o.max || Math.max(...items.map(d => d.value), 1);
+  items.forEach((d, i) => {
+    const y = i * row + 4, bw = Math.max(2, (w - lab - 84) * (d.value / max));
+    const g = el("g", { style: o.onClick ? "cursor:pointer" : "" }, s);
+    el("text", { x: lab - 8, y: y + row / 2 + 4, "text-anchor": "end", style: `font-size:12px;fill:${d.active === false ? css("--mute") : css("--ink")}` }, g).textContent = d.label;
+    el("rect", { x: lab, y: y + 5, width: w - lab - 84, height: row - 10, rx: 5, fill: css("--panel2") }, g);
+    const r = el("rect", { x: lab, y: y + 5, width: 0, height: row - 10, rx: 5, fill: d.color || css("--teal"), opacity: d.active === false ? .35 : 1 }, g);
+    r.animate([{ width: "0px" }, { width: bw + "px" }], { duration: 650, easing: "cubic-bezier(.2,.8,.2,1)", fill: "forwards" });
+    setTimeout(() => r.setAttribute("width", bw), 660);
+    el("text", { x: lab + bw + 6, y: y + row / 2 + 4, style: `font-size:12px;font-weight:700;fill:${css("--ink")}` }, g).textContent = o.fmt ? o.fmt(d.value) : d.value;
+    if (d.tip) hover(g, d.tip);
+    if (o.onClick) g.onclick = () => o.onClick(d);
+  });
+}
+function donut(container, items, o = {}) {
+  container.innerHTML = "";
+  const wrap = document.createElement("div");
+  wrap.style.cssText = "display:flex;align-items:center;gap:18px;flex-wrap:wrap";
+  container.appendChild(wrap);
+  const box = document.createElement("div"); box.style.width = "180px"; wrap.appendChild(box);
+  const s = svg(box, 200, 200), total = items.reduce((a, d) => a + d.value, 0) || 1;
+  let a0 = -Math.PI / 2;
+  items.forEach(d => {
+    const a1 = a0 + 2 * Math.PI * d.value / total, large = a1 - a0 > Math.PI ? 1 : 0;
+    const R = 92, r = 60, p = (a, rad) => [100 + rad * Math.cos(a), 100 + rad * Math.sin(a)];
+    const [x0, y0] = p(a0, R), [x1, y1] = p(a1 - 1e-4, R), [x2, y2] = p(a1 - 1e-4, r), [x3, y3] = p(a0, r);
+    const path = el("path", { d: `M${x0},${y0} A${R},${R} 0 ${large} 1 ${x1},${y1} L${x2},${y2} A${r},${r} 0 ${large} 0 ${x3},${y3} Z`, fill: d.color, stroke: css("--panel"), "stroke-width": 2 }, s);
+    hover(path, `<b>${esc(d.label)}</b><br>${fmt(d.value)} · ${(100 * d.value / total).toFixed(1)}%`);
+    path.addEventListener("mouseenter", () => path.setAttribute("transform", "translate(100 100) scale(1.04) translate(-100 -100)"));
+    path.addEventListener("mouseleave", () => path.removeAttribute("transform"));
+    a0 = a1;
+  });
+  el("text", { x: 100, y: 98, "text-anchor": "middle", style: `font-size:24px;font-weight:750;fill:${css("--ink")}` }, s).textContent = fmt(o.total ?? total);
+  el("text", { x: 100, y: 118, "text-anchor": "middle", style: "font-size:11px" }, s).textContent = o.label || "total";
+  const leg = document.createElement("div");
+  leg.style.cssText = "display:flex;flex-direction:column;gap:6px;font-size:12.5px;flex:1;min-width:140px";
+  leg.innerHTML = items.map(d => `<div style="display:flex;gap:8px;align-items:center"><i style="width:10px;height:10px;border-radius:3px;background:${d.color}"></i><span style="flex:1">${esc(d.label)}</span><b>${fmt(d.value)}</b></div>`).join("");
+  wrap.appendChild(leg);
+}
+function niceMax(v) { if (v <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))), n = v / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p; }
+function axisY(s, x0, x1, y, max, h, ticks, f) {
+  const g = el("g", { class: "grid" }, s);
+  for (let i = 0; i <= ticks; i++) {
+    const v = max * i / ticks, yy = y + h - h * i / ticks;
+    el("line", { x1: x0, x2: x1, y1: yy, y2: yy }, g);
+    el("text", { x: x0 - 6, y: yy + 4, "text-anchor": "end" }, s).textContent = f ? f(v) : Math.round(v);
+  }
+}
+function stackedArea(container, rows, keys, colors, o = {}) {
+  const w = container.clientWidth || 900, h = 270, m = { l: 46, r: 12, t: 10, b: 26 }, iw = w - m.l - m.r, ih = h - m.t - m.b;
+  const s = svg(container, w, h);
+  if (!rows.length) { container.innerHTML = '<div class="empty">No events.</div>'; return; }
+  const tot = rows.map(r => keys.reduce((a, k) => a + (r[k] || 0), 0)), max = niceMax(Math.max(...tot, 1) * 1.05);
+  const X = i => m.l + iw * i / Math.max(1, rows.length - 1), Y = v => m.t + ih - ih * v / max;
+  axisY(s, m.l, w - m.r, m.t, max, ih, 4, v => v >= 1000 ? (v / 1000).toFixed(1) + "k" : Math.round(v));
+  let base = rows.map(() => 0);
+  keys.forEach((k, ki) => {
+    const top = rows.map((r, i) => base[i] + (r[k] || 0));
+    const d = "M" + top.map((v, i) => `${X(i)},${Y(v)}`).join("L") + "L" + base.map((v, i) => `${X(i)},${Y(v)}`).reverse().join("L") + "Z";
+    const p = el("path", { d, fill: colors[ki], opacity: .85 }, s);
+    p.animate([{ opacity: 0 }, { opacity: .85 }], { duration: 500 + ki * 150, fill: "forwards" });
+    base = top;
+  });
+  rows.forEach((r, i) => { if (i % 5 === 0) el("text", { x: X(i), y: h - 8, "text-anchor": "middle" }, s).textContent = r.minute; });
+  if (o.marks) rows.forEach((r, i) => {
+    if (r.quarantined) el("rect", { x: X(i) - 1.5, y: m.t + ih - Math.min(30, 4 + r.quarantined * 1.2), width: 3, height: Math.min(30, 4 + r.quarantined * 1.2), fill: css("--red"), opacity: .8 }, s);
+    if (r.alerts) { const a = el("path", { d: `M${X(i)},${m.t + 4} l-7,-0 l7,12 l7,-12 z`, fill: css("--red") }, s); el("text", { x: X(i), y: m.t + 30, "text-anchor": "middle", style: `fill:${css("--red")};font-weight:700` }, s).textContent = r.alerts; }
+  });
+  const line = el("line", { y1: m.t, y2: m.t + ih, stroke: css("--ink"), "stroke-width": 1, opacity: 0 }, s);
+  const ov = el("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" }, s);
+  ov.addEventListener("mousemove", e => {
+    const pt = s.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const p = pt.matrixTransform(s.getScreenCTM().inverse());
+    const i = Math.max(0, Math.min(rows.length - 1, Math.round((p.x - m.l) / iw * (rows.length - 1))));
+    line.setAttribute("x1", X(i)); line.setAttribute("x2", X(i)); line.setAttribute("opacity", .4);
+    const r = rows[i];
+    tip.show(e, `<b>${r.minute}</b><br>` + keys.map((k, ki) => `<span style="color:${colors[ki]}">■</span> ${k}: <b>${fmt(r[k])}</b>`).join("<br>") + (r.quarantined ? `<br><span style="color:#ff8a8a">quarantined: ${r.quarantined}</span>` : "") + (r.alerts ? `<br><span style="color:#ff8a8a">alerts: ${r.alerts}</span>` : ""));
+  });
+  ov.addEventListener("mouseleave", () => { tip.hide(); line.setAttribute("opacity", 0); });
+}
+function lineChart(container, series, o = {}) {
+  const w = container.clientWidth || o.w || 640, h = o.h || 240, m = { l: 44, r: 14, t: 12, b: 26 }, iw = w - m.l - m.r, ih = h - m.t - m.b;
+  const s = svg(container, w, h);
+  const xs = series.flatMap(sr => sr.points.map(p => p.x)), ys = series.flatMap(sr => sr.points.map(p => p.y));
+  if (!xs.length) { container.innerHTML = '<div class="empty">No data yet.</div>'; return s; }
+  const xmin = o.xmin ?? Math.min(...xs), xmax = o.xmax ?? Math.max(...xs);
+  let ymin = o.ymin ?? Math.min(...ys, ...(o.thresholds || []).map(t => t.y)), ymax = o.ymax ?? Math.max(...ys, ...(o.thresholds || []).map(t => t.y));
+  const pad = (ymax - ymin) * .1 || 1; ymin = o.ymin ?? ymin - pad; ymax = o.ymax ?? ymax + pad;
+  const X = x => m.l + iw * (x - xmin) / Math.max(1e-9, xmax - xmin), Y = y => m.t + ih - ih * (y - ymin) / Math.max(1e-9, ymax - ymin);
+  const g = el("g", { class: "grid" }, s);
+  for (let i = 0; i <= 4; i++) { const v = ymin + (ymax - ymin) * i / 4; el("line", { x1: m.l, x2: w - m.r, y1: Y(v), y2: Y(v) }, g); el("text", { x: m.l - 6, y: Y(v) + 4, "text-anchor": "end" }, s).textContent = o.yfmt ? o.yfmt(v) : v.toFixed(1); }
+  const nx = o.xticks || 6;
+  for (let i = 0; i <= nx; i++) { const v = xmin + (xmax - xmin) * i / nx; el("text", { x: X(v), y: h - 8, "text-anchor": "middle" }, s).textContent = o.xfmt ? o.xfmt(v) : Math.round(v); }
+  (o.bands || []).forEach(b => el("rect", { x: m.l, width: iw, y: Y(b.to), height: Y(b.from) - Y(b.to), fill: b.color, opacity: .08 }, s));
+  (o.thresholds || []).forEach(t => { el("line", { x1: m.l, x2: w - m.r, y1: Y(t.y), y2: Y(t.y), stroke: t.color, "stroke-width": 1.5, "stroke-dasharray": "6 4" }, s); el("text", { x: w - m.r - 4, y: Y(t.y) - 5, "text-anchor": "end", style: `fill:${t.color};font-weight:700` }, s).textContent = t.label; });
+  (o.markers || []).forEach(mk => { el("line", { x1: X(mk.x), x2: X(mk.x), y1: m.t, y2: m.t + ih, stroke: mk.color, "stroke-width": 1.5 }, s); el("text", { x: X(mk.x) + 4, y: m.t + 11, style: `fill:${mk.color};font-weight:700` }, s).textContent = mk.label; });
+  series.forEach(sr => {
+    if (!sr.points.length) return;
+    const p = el("path", { d: "M" + sr.points.map(q => `${X(q.x)},${Y(q.y)}`).join("L"), fill: "none", stroke: sr.color, "stroke-width": sr.width || 2, opacity: sr.opacity ?? 1, "stroke-linejoin": "round" }, s);
+    if (o.animate !== false) { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 800, fill: "forwards" }); }
+    if (sr.dots !== false) sr.points.forEach(q => {
+      const c = el("circle", { cx: X(q.x), cy: Y(q.y), r: q.r || sr.r || 2.6, fill: q.color || sr.color, stroke: css("--panel"), "stroke-width": 1 }, s);
+      if (q.tip || sr.tip) hover(c, q.tip || sr.tip(q));
+    });
+  });
+  return s;
+}
+function columns(container, items, o = {}) {
+  const w = container.clientWidth || o.w || 640, h = o.h || 240, m = { l: 40, r: 10, t: 14, b: 30 }, iw = w - m.l - m.r, ih = h - m.t - m.b;
+  const s = svg(container, w, h), max = niceMax(Math.max(...items.map(d => d.value), 1) * 1.05), bw = iw / items.length;
+  axisY(s, m.l, w - m.r, m.t, max, ih, 4);
+  items.forEach((d, i) => {
+    const bh = ih * d.value / max, x = m.l + i * bw + bw * .15;
+    const r = el("rect", { x, y: m.t + ih - bh, width: bw * .7, height: bh, rx: 3, fill: d.color || css("--teal") }, s);
+    r.animate([{ transform: `translateY(${bh}px) scaleY(0)` }, { transform: "none" }], { duration: 500 + i * 15, easing: "ease-out" });
+    if (d.tip) hover(r, d.tip);
+    if (items.length <= 24 || i % Math.ceil(items.length / 12) === 0) el("text", { x: x + bw * .35, y: h - 10, "text-anchor": "middle" }, s).textContent = d.label;
+  });
+}
 
-    const a = await api('/api/v1/alerts');
-    document.getElementById('alerts').innerHTML = a.count === 0
-      ? '<p class="empty">No alerts in this run.</p>'
-      : `<table><tr><th>TYPE</th><th>SHIPMENT</th><th>RULE</th><th>STARTED</th><th>EXPLANATION</th></tr>` +
-        a.alerts.map(x => `<tr><td>${x.alert_type}</td><td class="mono">${x.shipment_id || ''}</td>
-          <td class="mono">${x.rule_id}</td><td class="mono">${(x.start_event_time||'').replace('T',' ').replace('Z','')}</td>
-          <td>${x.explanation}</td></tr>`).join('') + '</table>';
+/* =====================================================================
+   Data access: every run-scoped call carries the selected run
+   ===================================================================== */
+const state = { run: null, runs: [], page: "overview", cache: {} };
+const RUN_SCOPED = /^(run|alerts|quarantine|analytics|shipments|network|fleet|stream)/;
+async function api(path, { cache = true } = {}) {
+  const scoped = RUN_SCOPED.test(path);
+  const url = "/api/v1/" + path + (scoped && state.run ? (path.includes("?") ? "&" : "?") + "run=" + encodeURIComponent(state.run) : "");
+  if (cache && state.cache[url]) return state.cache[url];
+  const p = fetch(url).then(r => r.ok ? r.json() : r.json().then(j => Promise.reject(j.detail || r.status)));
+  if (cache) state.cache[url] = p;
+  p.catch(() => delete state.cache[url]);
+  return p;
+}
+const SCEN_LABEL = s => (s || "").split("_").map(w => w === "GPS" ? w : w[0] + w.slice(1).toLowerCase()).join(" ");
 
-    const c = await api('/api/v1/analytics/carriers');
-    document.getElementById('carriers').innerHTML =
-      `<table><tr><th>CARRIER</th><th>SHIPMENTS</th><th>OTIF %</th><th>MEDIAN DELAY (MIN)</th></tr>` +
-      c.carriers.map(x => `<tr><td class="mono">${x.carrier_id}</td><td>${x.shipments}</td>
-        <td>${x.otif_pct ?? '-'}</td><td>${x.median_delay_min ?? '-'}</td></tr>`).join('') + '</table>';
+/* =====================================================================
+   Navigation
+   ===================================================================== */
+const ICON = {
+  overview: '<path d="M3 13h8V3H3zm10 8h8V11h-8zM3 21h8v-6H3zm10-18v6h8V3z" fill="currentColor"/>',
+  live: '<path d="M2 12h4l3-8 4 16 3-8h6" stroke="currentColor" stroke-width="2" fill="none"/>',
+  fleet: '<path d="M3 7h11v8H3zM14 10h4l3 3v2h-7zM6 18a2 2 0 1 0 0-.1M17 18a2 2 0 1 0 0-.1" stroke="currentColor" stroke-width="1.8" fill="none"/>',
+  alerts: '<path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6zm-2 16a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" fill="none"/>',
+  carriers: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2" stroke="currentColor" stroke-width="2" fill="none"/>',
+  quality: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z M8.5 12l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.8" fill="none"/>',
+  models: '<circle cx="6" cy="6" r="2.5" fill="currentColor"/><circle cx="18" cy="6" r="2.5" fill="currentColor"/><circle cx="12" cy="18" r="2.5" fill="currentColor"/><path d="M6 6l6 12 6-12M6 6h12" stroke="currentColor" stroke-width="1.5" fill="none"/>',
+  scenarios: '<path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" fill="none"/>'
+};
+const PAGES = [["overview", "Overview"], ["live", "Live stream"], ["fleet", "Fleet map"], ["alerts", "Alerts"], ["carriers", "Carriers & delivery"], ["quality", "Data quality"], ["models", "Models"], ["scenarios", "Scenarios"]];
+const CRUMB = { overview: "Operations", live: "Stream processing", fleet: "Operations", alerts: "Operations", carriers: "Analytics · Gold", quality: "Pipeline", models: "35-day history", scenarios: "Pipeline" };
+$("#nav").innerHTML = PAGES.map(([k, l]) => `<button data-p="${k}"><svg viewBox="0 0 24 24">${ICON[k]}</svg>${l}${k === "live" ? '<span class="live">LIVE</span>' : ""}</button>`).join("");
+$("#nav").querySelectorAll("button").forEach(b => b.onclick = () => go(b.dataset.p));
+function go(page) {
+  state.page = page;
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("on", p.id === "pg-" + page));
+  document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.p === page));
+  $("#title").textContent = PAGES.find(p => p[0] === page)[1];
+  $("#crumb").textContent = CRUMB[page];
+  if (page !== "live") Live.pause();
+  if (page !== "fleet") Fleet.pause();
+  try { history.replaceState(null, "", "#" + page); } catch (e) { }
+  render(page);
+}
+const RENDER = {};
+function render(page) {
+  const f = RENDER[page];
+  if (f) f().catch(err => { console.error(err); const pg = $("#pg-" + page); if (pg && !pg.querySelector(".errbox")) pg.insertAdjacentHTML("afterbegin", `<div class="card errbox" style="margin-bottom:14px;border-color:var(--red)"><b>Could not load:</b> ${esc(err)}</div>`); });
+}
 
-    const q = await api('/api/v1/quarantine');
-    document.getElementById('dq').innerHTML = q.count === 0
-      ? '<p class="empty">Nothing quarantined in this run.</p>'
-      : `<table><tr><th>EVENT</th><th>TYPE</th><th>REASON</th><th>OBSERVED</th></tr>` +
-        q.records.map(x => `<tr><td class="mono">${x.event_id.slice(0,8)}…</td>
-          <td>${x.event_type}</td><td class="mono">${x.reason_codes.join(', ')}</td>
-          <td class="mono">${x.reasons.map(r => r.field + '=' + r.observed).join(', ')}</td></tr>`).join('') +
-        '</table>';
-  } catch (err) {
-    document.getElementById('lede').textContent =
-      'No run found yet. Run "make demo" and refresh this page.';
+/* =====================================================================
+   Header: runs, theme, health
+   ===================================================================== */
+async function loadRuns() {
+  const r = await api("runs", { cache: false });
+  state.runs = r.runs;
+  if (!state.run || !r.runs.find(x => x.run === state.run)) state.run = r.latest;
+  $("#runsel").innerHTML = r.runs.map(x => `<option value="${x.run}">${SCEN_LABEL(x.scenario)}</option>`).join("");
+  $("#runsel").value = state.run;
+  updateHeader();
+}
+function updateHeader() {
+  const cur = state.runs.find(x => x.run === state.run);
+  if (!cur) return;
+  $("#hdr-seed").textContent = "seed " + cur.seed;
+  api("run").then(r => { const c = $("#hdr-replay"); c.className = "chip " + (r.replay_match ? "ok" : "bad"); c.textContent = r.replay_match ? "✓ replay matched" : "✗ replay mismatch"; });
+}
+$("#runsel").onchange = e => { state.run = e.target.value; state.cache = {}; document.querySelectorAll(".errbox").forEach(n => n.remove()); updateHeader(); Live.reset(); Fleet.reset(); render(state.page); };
+$("#refresh").onclick = async () => { state.cache = {}; await loadRuns(); Live.reset(); Fleet.reset(); render(state.page); toast("Data reloaded", "Latest run files read again from data/runs.", css("--teal")); };
+$("#theme").onclick = () => {
+  const d = document.documentElement, t = d.dataset.theme === "dark" ? "light" : "dark";
+  d.dataset.theme = t; try { localStorage.setItem("lil-theme", t); } catch (e) { }
+  render(state.page);
+};
+try { const t = localStorage.getItem("lil-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) { }
+async function health() {
+  try { const h = await fetch("/api/v1/health").then(r => r.json()); $("#apidot").style.background = css("--teal"); $("#apitext").textContent = `API healthy · ${h.runs_available} runs`; }
+  catch (e) { $("#apidot").style.background = css("--red"); $("#apitext").textContent = "API unreachable"; }
+}
+
+/* =====================================================================
+   Overview
+   ===================================================================== */
+const STREAM_COLORS = () => [css("--gps"), css("--sensor"), css("--wh"), css("--status")];
+RENDER.overview = async () => {
+  const [run, tp, carriers, alerts, otif] = await Promise.all([api("run"), api("analytics/throughput"), api("analytics/carrier-detail"), api("alerts?limit=200"), api("analytics/otif")]);
+  const s = run.stats, nAlerts = s.cold_chain_alerts + s.route_deviation_alerts + (s.model_alerts || 0);
+  kpiRow($("#ov-kpis"), [
+    { label: "Events published", value: run.published, sub: `in ${run.seconds}s · 1 simulated hour`, color: "var(--sky)" },
+    { label: "Valid", value: s.valid, sub: `${(100 * s.valid / run.published).toFixed(1)}% of published`, color: "var(--teal)" },
+    { label: "Quarantined", value: s.quarantined, sub: "kept with a reason code", color: "var(--red)" },
+    { label: "Duplicates", value: s.duplicates, sub: "removed on event_id", color: "var(--slate)" },
+    { label: "Late events", value: s.late_within_tolerance + s.late_side_output, sub: `${fmt(s.late_side_output)} to side output`, color: "var(--amber)" },
+    { label: "Alerts", value: nAlerts, sub: `${s.suppressed_spikes} spikes suppressed`, color: "var(--red)", vcolor: nAlerts ? "var(--red)" : "var(--ink)" },
+    { label: "OTIF", value: otif.otif_pct, dec: 1, suf: "%", sub: `${otif.delivered} of ${otif.shipments} delivered`, color: "var(--teal)" },
+    { label: "Median delay", value: otif.median_delay_min, dec: 1, suf: " min", sub: `p95 ${fmt1(otif.p95_delay_min)} min`, color: "var(--navy)" },
+  ]);
+  const keys = ["gps", "sensor", "warehouse", "status"], cols = STREAM_COLORS();
+  $("#tp-legend").innerHTML = keys.map((k, i) => `<span><i style="background:${cols[i]}"></i>${k}</span>`).join("");
+  stackedArea($("#ov-throughput"), tp.minutes, keys, cols, { marks: true });
+  const totals = keys.map(k => tp.minutes.reduce((a, r) => a + (r[k] || 0), 0));
+  donut($("#ov-mix"), keys.map((k, i) => ({ label: ["GPS telemetry", "Reefer sensor", "Warehouse scan", "Shipment status"][i], value: totals[i], color: cols[i] })), { label: "valid events" });
+  const unique = run.published - s.quarantined - s.duplicates;
+  barH($("#ov-funnel"), [
+    { label: "Published", value: run.published, color: css("--sky") },
+    { label: "Passed validation", value: run.published - s.quarantined, color: css("--navy"), tip: `${fmt(s.quarantined)} quarantined` },
+    { label: "Unique", value: unique, color: css("--teal"), tip: `${fmt(s.duplicates)} duplicates removed` },
+    { label: "On time", value: s.on_time, color: css("--teal"), tip: `${fmt(s.late_within_tolerance)} late but tolerated, ${fmt(s.late_side_output)} to side output` },
+    { label: "Landed in Bronze", value: s.valid, color: css("--sensor") },
+  ], { labelW: 128, max: run.published, fmt: v => fmt(v) });
+  barH($("#ov-carriers"), carriers.carriers.map(c => ({ label: c.carrier_name || c.carrier_id, value: c.otif_pct || 0, color: (c.otif_pct || 0) < 60 ? css("--red") : (c.otif_pct || 0) < 80 ? css("--amber") : css("--teal"), id: c.carrier_id, tip: `<b>${esc(c.carrier_name)}</b> (${c.carrier_id})<br>${c.shipments} shipments · median delay ${fmt1(c.median_delay_min)} min` })),
+    { max: 100, labelW: 150, fmt: v => v.toFixed(1) + "%", onClick: d => { Carriers.selected = d.id; go("carriers"); } });
+  const al = alerts.alerts.slice(-6).reverse();
+  $("#ov-alerts").innerHTML = al.length ? al.map(a => `<div class="stat-row" style="cursor:pointer" data-s="${a.shipment_id}"><span><span class="pill ${a.severity === "CRITICAL" ? "p-crit" : "p-warn"}">${a.rule_id}</span> <b>${a.shipment_id}</b><br><span style="color:var(--mute);font-size:11.5px">${esc(a.explanation)}</span></span><span class="mono" style="color:var(--mute)">${hhmmss(a.start_event_time)}</span></div>`).join("")
+    : '<div class="empty">No alerts in this run. That is the correct result for this scenario.</div>';
+  $("#ov-alerts").querySelectorAll("[data-s]").forEach(n => n.onclick = () => openShipment(n.dataset.s));
+};
+
+/* =====================================================================
+   Live stream: replay the run's events through the pipeline stages
+   ===================================================================== */
+const Live = (() => {
+  const W = 1200, H = 440;
+  const TYPE = { "gps.telemetry": { y: 70, color: "--gps", label: "GPS", topic: "raw.gps" }, "sensor.reading": { y: 150, color: "--sensor", label: "Reefer sensor", topic: "raw.sensor" }, warehouse: { y: 230, color: "--wh", label: "Warehouse", topic: "raw.warehouse" }, status: { y: 310, color: "--status", label: "Shipment status", topic: "raw.shipment" } };
+  const kind = r => r.event_type === "gps.telemetry" ? "gps.telemetry" : r.event_type === "sensor.reading" ? "sensor.reading" : r.topic === "raw.warehouse" ? "warehouse" : "status";
+  const CY = 190, ST = { validate: 470, dedup: 600, time: 730, detect: 860 }, FALL = 392;
+  const SINK = { lake: { x: 1080, y: 85 }, pg: { x: 1080, y: 190 }, alert: { x: 1080, y: 295 } };
+  let data = null, recs = [], idx = 0, clock = 0, t0 = 0, t1 = 0, speed = 1, playing = false, last = 0, raf = null;
+  let parts = [], focus = null, hold = 0, cool = 0, built = false, counters = {}, reefer = {}, epsHist = [], epsWin = [], alertsN = 0, loading = null;
+  const S = () => $("#pipe");
+  const C = n => css(n);
+
+  function build() {
+    const s = S(); s.innerHTML = "";
+    el("rect", { x: 418, y: 122, width: 556, height: 136, rx: 16, class: "grp" }, s);
+    el("text", { x: 430, y: 114, style: `font-size:11px;fill:${C("--teal")};font-weight:700;letter-spacing:.6px` }, s).textContent = "STREAM CONSUMER · STATE + OFFSETS CHECKPOINTED EVERY 1 s";
+    // wires
+    Object.values(TYPE).forEach(t => { el("path", { class: "wire", d: `M140,${t.y} L196,${t.y}` }, s); el("path", { class: "wire", d: `M372,${t.y} C410,${t.y} 400,${CY} 420,${CY}` }, s); });
+    el("path", { class: "wire", d: `M420,${CY} L${ST.detect + 50},${CY}` }, s);
+    el("path", { class: "wire", d: `M${ST.detect + 50},${CY} C990,${CY} 980,${SINK.lake.y} 1010,${SINK.lake.y}` }, s);
+    el("path", { class: "wire", d: `M${ST.detect + 50},${CY} L1010,${SINK.pg.y}` }, s);
+    el("path", { class: "wire", d: `M${ST.detect + 50},${CY} C990,${CY} 980,${SINK.alert.y} 1010,${SINK.alert.y}` }, s);
+    ["validate", "dedup", "time"].forEach(k => el("path", { class: "wire dash", d: `M${ST[k]},${CY + 32} L${ST[k]},${FALL - 32}` }, s));
+    // producers
+    Object.entries(TYPE).forEach(([k, t]) => {
+      const g = el("g", { class: "node" }, s);
+      el("rect", { x: 20, y: t.y - 26, width: 120, height: 52, rx: 10 }, g);
+      el("circle", { cx: 38, cy: t.y, r: 7, fill: C(t.color) }, g);
+      el("text", { x: 52, y: t.y - 3, class: "t" }, g).textContent = t.label;
+      const c = el("text", { x: 52, y: t.y + 14, class: "s", id: "pc-" + k }, g); c.textContent = "0 sent";
+      // topic
+      const tg = el("g", { class: "node" }, s);
+      el("rect", { x: 196, y: t.y - 30, width: 176, height: 60, rx: 10 }, tg);
+      el("text", { x: 206, y: t.y - 13, class: "t", style: "font-size:11.5px;font-family:var(--mono)" }, tg).textContent = t.topic;
+      for (let p = 0; p < 6; p++) el("rect", { x: 206 + p * 27, y: t.y - 4, width: 23, height: 24, rx: 4, class: "cell", id: `cell-${k}-${p}` }, tg);
+      for (let p = 0; p < 6; p++) el("text", { x: 217.5 + p * 27, y: t.y + 12, "text-anchor": "middle", style: "font-size:9px" }, tg).textContent = "p" + p;
+    });
+    el("text", { x: 284, y: 22, "text-anchor": "middle", style: `font-size:11px;font-weight:700;fill:${C("--soft")}` }, s).textContent = "KAFKA 3.9 · 6 PARTITIONS · KEYED";
+    el("text", { x: 80, y: 22, "text-anchor": "middle", style: `font-size:11px;font-weight:700;fill:${C("--soft")}` }, s).textContent = "PRODUCERS";
+    const node = (id, x, y, t, sub, w = 100) => {
+      const g = el("g", { class: "node", id: "nd-" + id }, s);
+      el("rect", { x: x - w / 2, y: y - 32, width: w, height: 64, rx: 12 }, g);
+      el("text", { x, y: y - 11, "text-anchor": "middle", class: "t" }, g).textContent = t;
+      el("text", { x, y: y + 3, "text-anchor": "middle", class: "s" }, g).textContent = sub;
+      el("text", { x, y: y + 22, "text-anchor": "middle", class: "c", id: "ct-" + id }, g).textContent = "0";
+      return g;
+    };
+    node("validate", ST.validate, CY, "Validate", "structural → domain");
+    node("dedup", ST.dedup, CY, "Deduplicate", "event_id · 1 h");
+    node("time", ST.time, CY, "Event time", "watermark 60 s");
+    node("detect", ST.detect, CY, "Detect", "cold chain · route");
+    node("dlq", ST.validate, FALL, "quarantine.dlq", "reason + payload", 116);
+    node("dup", ST.dedup, FALL, "Dropped", "counted once", 104);
+    node("late", ST.time, FALL, "Late side output", "kept, not lost", 116);
+    node("lake", SINK.lake.x + 25, SINK.lake.y, "Lakehouse", "Bronze → Silver → Gold", 150);
+    node("pg", SINK.pg.x + 25, SINK.pg.y, "PostgreSQL 16", "status history", 150);
+    node("alert", SINK.alert.x + 25, SINK.alert.y, "alerts.* topics", "deterministic ids", 150);
+    el("text", { x: 1105, y: 352, "text-anchor": "middle", style: "font-size:10.5px" }, s).textContent = "status events also land in Bronze";
+    built = true;
+  }
+  const bump = (id, n = 1) => { counters[id] = (counters[id] || 0) + n; const t = document.getElementById("ct-" + id); if (t) t.textContent = fmt(counters[id]); };
+  function flash(id, cls = "hot") { const n = document.getElementById("nd-" + id); if (!n) return; n.classList.add(cls); clearTimeout(n._t); n._t = setTimeout(() => n.classList.remove(cls), 260); }
+
+  function path(r) {
+    const k = kind(r), t = TYPE[k], pts = [];
+    const cx = 217.5 + r.partition * 27;
+    pts.push([140, t.y, "src"], [cx, t.y + 8, "cell"], [372, t.y, null], [420, CY, null], [ST.validate, CY, "validate"]);
+    if (r.outcome === "quarantined") { pts.push([ST.validate, FALL, "dlq"]); return pts; }
+    pts.push([ST.dedup, CY, "dedup"]);
+    if (r.outcome === "duplicate") { pts.push([ST.dedup, FALL, "dup"]); return pts; }
+    pts.push([ST.time, CY, "time"]);
+    if (r.outcome === "late_side_output") { pts.push([ST.time, FALL, "late"]); return pts; }
+    pts.push([ST.detect, CY, "detect"]);
+    if (r.alert) pts.push([1010, SINK.alert.y, "alert"]);
+    else if (k === "status") pts.push([1010, SINK.pg.y, "pg"]);
+    else pts.push([1010, SINK.lake.y, "lake"]);
+    return pts;
+  }
+  function colorOf(r) {
+    if (r.outcome === "quarantined" || r.alert) return C("--red");
+    if (r.outcome === "duplicate") return "#9aa7b4";
+    if (r.outcome.startsWith("late") || r.breach || r.outside) return C("--amber");
+    return C(TYPE[kind(r)].color);
+  }
+  function spawn(r, focused) {
+    const pts = path(r), segs = [];
+    let L = 0;
+    for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); segs.push(d); L += d; }
+    const c = el("circle", { r: focused ? 9 : 4.5, fill: C(TYPE[kind(r)].color), stroke: focused ? "#fff" : "none", "stroke-width": 2.5, style: "cursor:pointer" }, S());
+    c.onclick = () => { inspect(r); };
+    const p = { r, pts, segs, L, d: 0, seg: 0, node: c, focused, done: false, recolored: false };
+    if (focused) { p.halo = el("circle", { r: 16, fill: "none", stroke: C("--teal"), "stroke-width": 2, opacity: .7 }, S()); }
+    parts.push(p);
+    arrive(p, "src");
+    return p;
+  }
+  function arrive(p, tag) {
+    const r = p.r, k = kind(r);
+    if (tag === "src") { bump("p-" + k); const t = document.getElementById("pc-" + k); if (t) t.textContent = fmt(counters["p-" + k]) + " sent"; }
+    else if (tag === "cell") { const c = document.getElementById(`cell-${k}-${r.partition}`); if (c) { c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 120); } }
+    else if (tag) {
+      bump(tag);
+      flash(tag, (tag === "dlq" || tag === "alert" || (tag === "validate" && r.outcome === "quarantined")) ? "fail" : "hot");
+      if (tag === "validate" && r.outcome === "quarantined" || tag === "dedup" && r.outcome === "duplicate" || tag === "time" && r.outcome.startsWith("late") || tag === "detect" && (r.breach || r.outside || r.alert)) { p.node.setAttribute("fill", colorOf(r)); }
+      if (tag === "detect" && r.alert) {
+        const ring = el("circle", { cx: ST.detect, cy: CY, r: 30, fill: "none", stroke: C("--red"), "stroke-width": 3 }, S());
+        ring.animate([{ r: 30, opacity: 1 }, { r: 90, opacity: 0 }], { duration: 900 }).onfinish = () => ring.remove();
+        alertsN++; $("#ck-al").textContent = alertsN;
+        const a = r.alert;
+        toast(`${a.severity} · ${a.rule_id} ${a.alert_type === "cold_chain" ? "cold-chain alert" : "route deviation"}`, `${esc(a.shipment_id)}: ${esc(a.explanation)}`, a.severity === "CRITICAL" ? C("--red") : C("--amber"));
+        if (a.alert_type === "cold_chain") bump("detect-alert");
+      }
+    }
+    if (p.focused) stepTo(tag);
+  }
+  function update(dt) {
+    const v = 330 * (focus ? 0.45 : Math.min(2.2, 0.75 + speed * 0.25));
+    for (const p of parts) {
+      if (focus && p !== focus) continue;
+      if (p === focus && hold > 0) { hold -= dt; continue; }
+      p.d += v * dt;
+      let acc = 0, i = 0;
+      while (i < p.segs.length && acc + p.segs[i] < p.d) { acc += p.segs[i]; i++; }
+      while (p.seg < i) { p.seg++; const tag = p.pts[p.seg][2]; arrive(p, tag); if (p === focus && tag && tag !== "cell") { hold = 0.65; p.d = acc; break; } }
+      if (i >= p.segs.length) { p.done = true; continue; }
+      const f = (p.d - acc) / p.segs[i], a = p.pts[i], b = p.pts[i + 1];
+      const x = a[0] + (b[0] - a[0]) * f, y = a[1] + (b[1] - a[1]) * f;
+      p.node.setAttribute("cx", x); p.node.setAttribute("cy", y);
+      if (p.halo) { p.halo.setAttribute("cx", x); p.halo.setAttribute("cy", y); }
+    }
+    parts = parts.filter(p => {
+      if (!p.done) return true;
+      p.node.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 }).onfinish = () => p.node.remove();
+      if (p.halo) p.halo.remove();
+      if (p === focus) { focus = null; cool = 6; caption("Back to streaming. The next notable event will be explained.", "▶"); }
+      return false;
+    });
+  }
+  function notable(r) { return r.alert || r.outcome === "quarantined" || r.outcome === "duplicate" || r.outcome === "late_side_output"; }
+  let explainNext = false, alertCool = 0;
+  function emit(r) {
+    let f = false;
+    const auto = $("#lv-auto").checked && (r.alert ? alertCool <= 0 : cool <= 0 && notable(r));
+    if (!focus && (explainNext || auto)) { f = true; explainNext = false; if (r.alert) alertCool = 8; }
+    const p = parts.length > 260 && !f ? null : spawn(r, f);
+    if (!p) { // too many dots on screen: count it without drawing
+      const fake = { r, focused: false, node: { setAttribute() { } } };
+      path(r).forEach(q => q[2] && arrive(fake, q[2]));
+    }
+    if (f) { focus = p; inspect(r, true); }
+    log(r); trackReefer(r);
+    epsWin.push(performance.now());
+    if (r.watermark) $("#ck-wm").textContent = hhmmss(r.watermark);
+    $("#ck-et").textContent = hhmmss(r.event_time);
+  }
+  function tick(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (playing && !focus) {
+      cool -= dt; alertCool -= dt;
+      clock += dt * 1000 * speed;
+      let n = 0;
+      while (idx < recs.length && recs[idx]._t <= clock && n < 60) { emit(recs[idx]); idx++; n++; if (focus) break; }
+      if (idx >= recs.length && !parts.length) { playing = false; setPlay(); }
+    }
+    update(dt);
+    const nowMs = performance.now(); epsWin = epsWin.filter(t => nowMs - t < 1000);
+    $("#ck-eps").textContent = epsWin.length;
+    progress();
+    raf = requestAnimationFrame(tick);
+  }
+  let lastSpark = 0;
+  function progress() {
+    const k = recs.length ? idx / recs.length : 0;
+    $("#lv-prog i").style.width = (k * 100) + "%";
+    $("#lv-pos").textContent = `${fmt(idx)} / ${fmt(recs.length)} events`;
+    const now = performance.now();
+    if (now - lastSpark > 1000) {
+      lastSpark = now; epsHist.push(epsWin.length); if (epsHist.length > 40) epsHist.shift();
+      if (playing && !focus) caption(`Streaming at <b>${speed}×</b> real time · <b>${epsWin.length}</b> events/s through validate → dedup → event time → detect. Notable events pause the stream and are explained step by step.`, "▶");
+      drawReefer();
+    }
+  }
+  // ---------------- inspector -----------------
+  let insp = null, insStep = -1;
+  const STEP_TAGS = ["src", "cell", "validate", "dedup", "time", "detect", "sink"];
+  function inspect(r, animated) {
+    insp = r; insStep = animated ? -1 : 99;
+    const o = r.outcome, rules = data.rules;
+    const chip = r.alert ? '<span class="pill p-crit">ALERT</span>' : o === "quarantined" ? '<span class="pill p-crit">QUARANTINED</span>' : o === "duplicate" ? '<span class="pill p-mute">DUPLICATE</span>' : o === "late_side_output" ? '<span class="pill p-warn">LATE · SIDE OUTPUT</span>' : o === "late_tolerated" ? '<span class="pill p-warn">LATE · TOLERATED</span>' : r.breach ? '<span class="pill p-warn">BREACH READING</span>' : '<span class="pill p-ok">ON TIME</span>';
+    $("#ins-chip").innerHTML = chip;
+    $("#ins-sub").textContent = `${r.event_type} · ${r.key}`;
+    const env = { event_id: r.event_id, event_type: r.event_type, event_time: r.event_time, ingest_time: r.ingest_time, source: r.source, schema_version: r.schema_version };
+    ["vehicle_id", "sensor_id", "shipment_id", "warehouse_id"].forEach(k => { if (r[k]) env[k] = r[k]; });
+    env.payload = r.payload;
+    $("#ins-json").innerHTML = prettyJson(env);
+    const late = r.lateness_s;
+    const steps = [];
+    steps.push({ t: "Produced", x: `${esc(r.source)} · event_time <b>${hhmmss(r.event_time)}</b>, ingested ${hhmmss(r.ingest_time)}`, s: "done" });
+    steps.push({ t: "Kafka", x: `<span class="mono">${r.topic}</span> · partition <b>p${r.partition}</b> (key ${esc(r.key)}) · offset ${fmt(r.offset)}`, s: "done" });
+    if (o === "quarantined") steps.push({ t: "Validate ✗", x: "Rejected and routed to <span class='mono'>quarantine.dlq</span> with the raw payload:", list: (r.reasons || []).map(e => `<b>${e.rule_id}</b>: ${e.field} = ${esc(e.observed)}, expected ${esc(e.expected)}`), s: "fail" });
+    else steps.push({ t: "Validate ✓", x: `${r.checks.length} checks passed`, list: r.checks.map(c => "✓ " + esc(c)), s: "done" });
+    if (o !== "quarantined") {
+      if (o === "duplicate") steps.push({ t: "Deduplicate ✗", x: `This event_id was already processed inside the ${rules.dedup_window_s / 3600} h window. Dropped, so it is counted once.`, s: "fail" });
+      else steps.push({ t: "Deduplicate ✓", x: `First time this event_id is seen (window ${rules.dedup_window_s / 3600} h).`, s: "done" });
+    }
+    if (o !== "quarantined" && o !== "duplicate") {
+      const wm = r.watermark ? hhmmss(r.watermark) : "not set yet";
+      if (o === "late_side_output") steps.push({ t: "Event time: late", x: `Watermark ${wm}. Event is ${Math.round(late)} s behind it, more than the ${rules.allowed_lateness_s / 60} min allowed lateness → <b>late side output</b> (stored and counted, not dropped).`, s: "warn" });
+      else if (o === "late_tolerated") steps.push({ t: "Event time: late but accepted", x: `Watermark ${wm}. Event is ${Math.round(late)} s behind it, within the ${rules.allowed_lateness_s / 60} min allowed lateness, so it still updates its window.`, s: "warn" });
+      else steps.push({ t: "Event time ✓", x: `Watermark ${wm} (newest event time − ${rules.watermark_s} s). Event is on time.`, s: "done" });
+      let det;
+      if (r.alert) det = { t: "Detect: ALERT", x: `<b>${r.alert.rule_id}</b> · ${esc(r.alert.explanation)}`, s: "fail" };
+      else if (r.event_type === "sensor.reading" && r.breach != null) det = r.breach ? { t: "Detect: breach", x: `${r.payload.temperature_c} °C is above ${rules.max_celsius} °C. Breach reading in an open episode; ${rules.consecutive} consecutive readings make an alert.`, s: "warn" } : { t: "Detect ✓", x: `${r.payload.temperature_c} °C is inside 2–${rules.max_celsius} °C.${r.note ? " " + r.note + "." : ""}`, s: "done" };
+      else if (r.corridor_m != null) det = r.outside ? { t: "Detect: off corridor", x: `${fmt1(r.corridor_m)} m from the planned route (limit ${rules.corridor_m} m). Alert if it stays outside ${rules.persistence_s} s.`, s: "warn" } : { t: "Detect ✓", x: `${fmt1(r.corridor_m)} m from the planned route corridor (limit ${rules.corridor_m} m).`, s: "done" };
+      else if (r.event_type === "sensor.reading") det = { t: "Detect ✓", x: "Ambient load: the cold-chain rule does not apply.", s: "done" };
+      else det = { t: "Detect ✓", x: "No detection rule for this event type.", s: "done" };
+      steps.push(det);
+      const k = kind(r);
+      steps.push({ t: "Sink", x: r.alert ? `Alert published to <span class="mono">alerts.${r.alert.alert_type}</span> with id <span class="mono">${esc(r.alert.alert_id)}</span>; written to PostgreSQL with ON CONFLICT DO NOTHING. The reading itself lands in Bronze.` : k === "status" ? "Appended to PostgreSQL status history (forward-only in event time) and Bronze." : `Bronze partition <span class="mono">event_type=${r.event_type}/event_date=${r.event_time.slice(0, 10)}</span>, then Silver and Gold.`, s: "done" });
+    }
+    capSteps = steps;
+    $("#ins-steps").innerHTML = steps.map((st, i) => `<li data-i="${i}" class="${st.s}"><span class="n">${i + 1}</span><div><b>${st.t}</b><div class="x">${st.x}</div>${st.list ? `<ul>${st.list.slice(0, 6).map(x => `<li style="display:list-item;opacity:1;border:0;padding:0">${x}</li>`).join("")}${st.list.length > 6 ? `<li style="display:list-item;opacity:1;border:0;padding:0">… ${st.list.length - 6} more</li>` : ""}</ul>` : ""}</div></li>`).join("");
+    revealSteps(animated ? 0 : 99);
+  }
+  let capSteps = [];
+  function caption(html, n, cls) {
+    const c = $("#lv-caption"); c.className = cls || "";
+    $("#lv-cap-n").textContent = n; $("#lv-cap-text").innerHTML = html;
+  }
+  function revealSteps(n) {
+    document.querySelectorAll("#ins-steps > li").forEach((li, i) => { li.classList.toggle("act", i === n); if (i <= n) li.style.opacity = 1; else li.style.opacity = .3; });
+    if (focus && capSteps[n]) { const st = capSteps[n]; caption(`<b>${st.t}</b> — ${st.x}${st.list && st.s === "fail" ? " " + st.list[0] : ""}`, `${n + 1}/${capSteps.length}`, st.s === "fail" ? "fail" : st.s === "warn" ? "warn" : ""); }
+  }
+  function stepTo(tag) {
+    const map = { src: 0, cell: 1, validate: 2, dlq: 2, dedup: 3, dup: 3, time: 4, late: 4, detect: 5, lake: 6, pg: 6, alert: 6 };
+    if (tag in map) revealSteps(map[tag]);
+  }
+  // ---------------- log and reefer -----------------
+  function log(r) {
+    const box = $("#lv-log"), d = document.createElement("div");
+    const o = r.alert ? '<span class="pill p-crit">alert</span>' : r.outcome === "quarantined" ? '<span class="pill p-crit">quarantine</span>' : r.outcome === "duplicate" ? '<span class="pill p-mute">duplicate</span>' : r.outcome.startsWith("late") ? '<span class="pill p-warn">late</span>' : r.breach ? '<span class="pill p-warn">breach</span>' : '<span class="pill p-ok">ok</span>';
+    d.innerHTML = `<span class="mono">${hhmmss(r.event_time)}</span><span style="color:${C(TYPE[kind(r)].color)};font-weight:600">${{ "gps.telemetry": "GPS", "sensor.reading": "Sensor", warehouse: "Warehouse", status: "Status" }[kind(r)]}</span><span class="mono" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.key)}${r.payload.temperature_c != null ? " · " + r.payload.temperature_c + " °C" : ""}</span>${o}`;
+    d.onclick = () => inspect(r);
+    box.prepend(d);
+    while (box.children.length > 60) box.lastChild.remove();
+  }
+  function trackReefer(r) {
+    if (r.breach == null) return;
+    const k = r.shipment_id || r.sensor_id;
+    (reefer[k] = reefer[k] || { pts: [], alert: false }).pts.push({ x: Date.parse(r.event_time) / 1000, y: r.payload.temperature_c, color: r.breach ? C("--red") : null, r: r.breach ? 4 : 2.4, tip: `<b>${esc(k)}</b><br>${hhmmss(r.event_time)} · ${r.payload.temperature_c} °C` });
+    if (r.alert) reefer[k].alert = true;
+  }
+  function drawReefer() {
+    const keys = Object.keys(reefer);
+    if (!keys.length) { $("#lv-reefer").innerHTML = '<div class="empty">Waiting for reefer readings…</div>'; return; }
+    const series = keys.map(k => ({ name: k, color: reefer[k].alert ? C("--red") : C("--sensor"), opacity: reefer[k].alert ? 1 : .45, width: reefer[k].alert ? 2.4 : 1.3, points: reefer[k].pts.slice(-40) }));
+    lineChart($("#lv-reefer"), series, { h: 300, w: 520, animate: false, thresholds: [{ y: data.rules.max_celsius, label: "8 °C limit", color: C("--red") }], bands: [{ from: 2, to: 8, color: C("--teal") }], xfmt: v => new Date(v * 1000).toISOString().slice(11, 16), xticks: 3, yfmt: v => v.toFixed(0) + "°" });
+  }
+  // ---------------- controls -----------------
+  function setPlay() { $("#lv-play").innerHTML = playing ? "❚❚ Pause" : "▶ Play"; }
+  async function load() {
+    if (data) return data;
+    if (loading) return loading;
+    $("#lv-hint").textContent = "Replaying this run through a fresh pipeline… (a few seconds the first time)";
+    loading = api("stream/trace?limit=2400").then(d => {
+      data = d; recs = d.window;
+      // ingest_time has one-second resolution; spread each second's events across it for display
+      // ingest_time has one-second resolution and producers emit in bursts; for display, each
+      // burst is spread evenly over the gap to the next one (order is unchanged)
+      const groups = {};
+      recs.forEach(r => (groups[r.ingest_time] = groups[r.ingest_time] || []).push(r));
+      const keys = Object.keys(groups).sort();
+      keys.forEach((k, j) => {
+        const t = Date.parse(k), next = j + 1 < keys.length ? Date.parse(keys[j + 1]) : t + 1000, gap = Math.min(5000, Math.max(1000, next - t));
+        groups[k].forEach((r, i) => r._t = t + gap * i / groups[k].length);
+      });
+      t0 = recs.length ? recs[0]._t : 0; t1 = recs.length ? recs[recs.length - 1]._t : 0;
+      $("#lv-hint").innerHTML = `Every dot is a real event from the <b>${SCEN_LABEL(d.scenario)}</b> run's Kafka topics (events ${fmt(d.window_start)}–${fmt(d.window_start + recs.length)} of ${fmt(d.total_events)}), sent through a fresh copy of the real pipeline. Its route shows what each stage decided.`;
+      const first = recs.findIndex(r => r.alert);
+      const mk = $("#lv-prog b"); if (mk) mk.remove();
+      if (first >= 0) { const b = document.createElement("b"); b.style.left = (100 * first / recs.length) + "%"; b.title = "first alert"; $("#lv-prog").appendChild(b); }
+      $("#lv-jump").style.display = first >= 0 ? "" : "none";
+      seek(0);
+      loading = null;
+      return d;
+    });
+    return loading;
+  }
+  function clearParts() { parts.forEach(p => { p.node.remove(); if (p.halo) p.halo.remove(); }); parts = []; focus = null; hold = 0; }
+  function seek(i) {
+    clearParts();
+    idx = Math.max(0, Math.min(recs.length, i));
+    clock = idx < recs.length ? recs[idx]._t : t1;
+    counters = {}; reefer = {}; alertsN = 0; cool = 0; alertCool = 0;
+    build();
+    const pre = recs.slice(0, idx);
+    pre.forEach(r => { const fake = { r, focused: false, node: { setAttribute() { } } }; path(r).forEach(q => { if (q[2] && q[2] !== "cell") { if (q[2] === "src") { const k = kind(r); counters["p-" + k] = (counters["p-" + k] || 0) + 1; } else counters[q[2]] = (counters[q[2]] || 0) + 1; } }); if (r.alert) alertsN++; trackReefer(r); });
+    Object.entries(counters).forEach(([k, v]) => { const t = document.getElementById("ct-" + k); if (t) t.textContent = fmt(v); if (k.startsWith("p-")) { const pc = document.getElementById("pc-" + k.slice(2)); if (pc) pc.textContent = fmt(v) + " sent"; } });
+    $("#ck-al").textContent = alertsN;
+    $("#lv-log").innerHTML = ""; pre.slice(-15).forEach(log);
+    drawReefer();
+  }
+  function init() {
+    $("#lv-speed").innerHTML = [0.5, 1, 2, 5].map(v => `<button data-v="${v}" class="${v === speed ? "on" : ""}">${v}×</button>`).join("");
+    $("#lv-speed").querySelectorAll("button").forEach(b => b.onclick = () => { speed = +b.dataset.v; $("#lv-speed").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); });
+    $("#lv-play").onclick = async () => { await load(); playing = !playing; if (idx >= recs.length) seek(0); setPlay(); };
+    $("#lv-restart").onclick = async () => { await load(); seek(0); playing = true; setPlay(); };
+    $("#lv-jump").onclick = async () => { await load(); const f = recs.findIndex(r => r.alert); if (f < 0) return; const cc = recs[f]; let j = f; while (j > 0 && recs[f]._t - recs[j]._t < 4000) j--; seek(j); playing = true; setPlay(); };
+    $("#lv-explain").onclick = async () => { await load(); explainNext = true; if (!playing) { playing = true; setPlay(); } };
+    $("#lv-prog").onclick = async e => { await load(); const b = e.currentTarget.getBoundingClientRect(); seek(Math.round(recs.length * (e.clientX - b.left) / b.width)); };
+    last = performance.now();
+    raf = requestAnimationFrame(tick);
+  }
+  return {
+    init, load,
+    pause() { playing = false; setPlay(); },
+    reset() { playing = false; setPlay(); data = null; recs = []; clearParts(); built = false; $("#lv-log").innerHTML = ""; $("#ins-steps").innerHTML = ""; $("#ins-json").textContent = "{ }"; $("#ins-chip").innerHTML = ""; },
+    render: async () => { if (!built) build(); await load(); }
+  };
+})();
+RENDER.live = () => Live.render();
+
+/* =====================================================================
+   Fleet map
+   ===================================================================== */
+const Fleet = (() => {
+  let net = null, fl = null, alerts = [], t = 0, playing = false, speed = 60, last = 0, proj = null, vehNodes = {}, loaded = null, shipVeh = {};
+  const W = 1000, H = 620;
+  function project(nodes) {
+    const lats = nodes.map(n => n.lat), lons = nodes.map(n => n.lon);
+    const la0 = Math.min(...lats), la1 = Math.max(...lats), lo0 = Math.min(...lons), lo1 = Math.max(...lons), k = Math.cos((la0 + la1) / 2 * Math.PI / 180);
+    const sx = (W - 120) / ((lo1 - lo0) * k), sy = (H - 90) / (la1 - la0), sc = Math.min(sx, sy);
+    const ox = (W - (lo1 - lo0) * k * sc) / 2, oy = (H - (la1 - la0) * sc) / 2;
+    return (lat, lon) => [ox + (lon - lo0) * k * sc, oy + (la1 - lat) * sc];
+  }
+  function draw() {
+    const s = $("#fleetmap"); s.innerHTML = ""; vehNodes = {};
+    proj = project(net.nodes);
+    const P = id => { const n = net.nodes.find(x => x.id === id); return proj(n.lat, n.lon); };
+    net.edges.forEach(([a, b]) => { const [x1, y1] = P(a), [x2, y2] = P(b); el("line", { x1, y1, x2, y2, class: "road" }, s); el("line", { x1, y1, x2, y2, class: "road2" }, s); });
+    net.nodes.forEach(n => { const [x, y] = proj(n.lat, n.lon); el("circle", { cx: x, cy: y, r: 3.5, fill: css("--slate") }, s); el("text", { x: x + 7, y: y - 7, style: "font-size:10.5px" }, s).textContent = n.id.replace(/_/g, " "); });
+    net.warehouses.forEach(w => { const [x, y] = proj(w.lat, w.lon); const g = el("g", {}, s); el("rect", { x: x - 11, y: y - 11, width: 22, height: 22, rx: 5, fill: css("--panel"), stroke: css("--violet"), "stroke-width": 2.5 }, g); el("text", { x, y: y + 4, "text-anchor": "middle", style: `font-size:9px;font-weight:800;fill:${css("--violet")}` }, g).textContent = w.id.slice(-1); el("text", { x, y: y + 26, "text-anchor": "middle", style: `font-size:10.5px;font-weight:700;fill:${css("--violet")}` }, g).textContent = w.id; hover(g, `<b>${w.id}</b><br>${w.node.replace(/_/g, " ")}`); });
+    el("g", { id: "fl-marks" }, s);
+    const cold = new Set(fl.cold_shipments);
+    fl.vehicles.forEach(v => {
+      const g = el("g", { class: "veh", opacity: 0 }, s);
+      const halo = el("circle", { r: 6, fill: "none", stroke: css("--red"), "stroke-width": 2, opacity: 0 }, g);
+      const c = el("circle", { r: 6.5, stroke: css("--panel"), "stroke-width": 2 }, g);
+      g.onclick = () => { const sh = cur(v)?.[4]; if (sh) openShipment(sh); };
+      g.addEventListener("mousemove", e => { const p = cur(v); tip.show(e, `<b>${v.vehicle_id}</b> · ${esc(v.registration || "")}<br>${esc(v.carrier_name || "")}<br>shipment <b>${p ? p[4] : "—"}</b> · ${p ? fmt1(p[3]) : 0} km/h<br>${p && cold.has(p[4]) ? "reefer load 2–8 °C" : "ambient load"}`); });
+      g.addEventListener("mouseleave", () => tip.hide());
+      vehNodes[v.vehicle_id] = { g, c, halo, v };
+      v.track.forEach(p => { shipVeh[p[4]] = v.vehicle_id; });
+    });
+  }
+  function cur(v) { const tr = v.track; let lo = 0, hi = tr.length - 1; if (!tr.length || t < tr[0][0] - 1 || t > tr[hi][0] + 30) return null; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (tr[m][0] <= t) lo = m; else hi = m - 1; } return tr[lo]; }
+  function pos(v) {
+    const tr = v.track; if (!tr.length || t < tr[0][0] - 1 || t > tr[tr.length - 1][0] + 30) return null;
+    let i = 0; while (i < tr.length - 1 && tr[i + 1][0] <= t) i++;
+    const a = tr[i], b = tr[Math.min(i + 1, tr.length - 1)], f = b[0] > a[0] ? Math.max(0, Math.min(1, (t - a[0]) / (b[0] - a[0]))) : 0;
+    return [a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, a];
+  }
+  function frame() {
+    const cold = new Set(fl.cold_shipments);
+    const fired = alerts.filter(a => Date.parse(a.trigger_event_time || a.trigger_ingest_time || a.start_event_time) / 1000 <= t);
+    const ccShip = new Set(fired.filter(a => a.alert_type === "cold_chain").map(a => a.shipment_id)), rdShip = new Set(fired.filter(a => a.alert_type === "route_deviation").map(a => a.shipment_id));
+    let onRoad = 0, coldN = 0, speedSum = 0;
+    Object.values(vehNodes).forEach(({ g, c, halo, v }) => {
+      const p = pos(v);
+      if (!p) { g.setAttribute("opacity", 0); return; }
+      const [x, y] = proj(p[0], p[1]), sh = p[2][4];
+      g.setAttribute("opacity", 1); g.setAttribute("transform", `translate(${x} ${y})`);
+      const isCold = cold.has(sh); onRoad++; speedSum += p[2][3]; if (isCold) coldN++;
+      const col = ccShip.has(sh) ? css("--red") : rdShip.has(sh) ? css("--amber") : isCold ? css("--teal") : css("--navy");
+      c.setAttribute("fill", col);
+      const alarm = ccShip.has(sh) || rdShip.has(sh);
+      halo.setAttribute("stroke", col); halo.classList.toggle("pulse", alarm); halo.setAttribute("opacity", alarm ? .8 : 0);
+    });
+    const d = new Date(t * 1000).toISOString().slice(11, 19);
+    $("#fl-clock").textContent = d;
+    $("#fl-stats").innerHTML = `<div class="stat-row"><span>Vehicles on the road</span><b>${onRoad}</b></div><div class="stat-row"><span>Carrying reefer loads</span><b>${coldN}</b></div><div class="stat-row"><span>Average speed</span><b>${onRoad ? (speedSum / onRoad).toFixed(1) : "—"} km/h</b></div><div class="stat-row"><span>Alerts raised so far</span><b style="color:var(--red)">${fired.length}</b></div>`;
+    const key = fired.length;
+    if ($("#fl-alerts")._n !== key) {
+      $("#fl-alerts")._n = key;
+      $("#fl-alerts").innerHTML = fired.length ? fired.slice().reverse().map(a => `<div class="stat-row" style="cursor:pointer" data-s="${a.shipment_id}"><span><span class="pill ${a.severity === "CRITICAL" ? "p-crit" : "p-warn"}">${a.rule_id}</span> ${a.shipment_id}</span><span class="mono">${hhmmss(a.trigger_event_time || a.start_event_time)}</span></div>`).join("") : '<div class="empty" style="padding:12px">None yet.</div>';
+      $("#fl-alerts").querySelectorAll("[data-s]").forEach(n => n.onclick = () => openShipment(n.dataset.s));
+      const mk = $("#fl-marks"); mk.innerHTML = "";
+      fired.filter(a => a.observed_latitude).forEach(a => { const [x, y] = proj(a.observed_latitude, a.observed_longitude); const g = el("g", {}, mk); el("path", { d: `M${x},${y - 18} l-8,0 l8,14 l8,-14 z`, fill: css("--amber"), stroke: css("--panel") }, g); hover(g, `<b>${a.rule_id}</b> ${a.shipment_id}<br>${esc(a.explanation)}`); });
+    }
+    $("#fl-slider").value = Math.round(1000 * (t - fl.start) / Math.max(1, fl.end - fl.start));
+  }
+  function loop(now) {
+    const dt = Math.min(.1, (now - last) / 1000); last = now;
+    if (playing) { t += dt * speed; if (t >= fl.end) { t = fl.end; playing = false; setBtn(); } frame(); }
+    if (state.page === "fleet") requestAnimationFrame(loop); else running = false;
+  }
+  let running = false;
+  function setBtn() { $("#fl-play").innerHTML = playing ? "❚❚ Pause" : "▶ Play"; }
+  async function load() {
+    if (loaded) return loaded;
+    loaded = Promise.all([api("network"), api("fleet?step=15"), api("alerts?limit=500")]).then(([n, f, a]) => { net = n; fl = f; alerts = a.alerts; t = f.start; draw(); frame(); });
+    return loaded;
+  }
+  $("#fl-speed").innerHTML = [30, 60, 120, 300].map(v => `<button data-v="${v}" class="${v === speed ? "on" : ""}">${v}×</button>`).join("");
+  $("#fl-speed").querySelectorAll("button").forEach(b => b.onclick = () => { speed = +b.dataset.v; $("#fl-speed").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); });
+  $("#fl-play").onclick = () => { if (!fl) return; if (t >= fl.end) t = fl.start; playing = !playing; setBtn(); };
+  $("#fl-slider").oninput = e => { if (!fl) return; t = fl.start + (fl.end - fl.start) * e.target.value / 1000; frame(); };
+  return {
+    render: async () => { await load(); frame(); if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); } },
+    pause() { playing = false; setBtn(); },
+    reset() { playing = false; loaded = null; net = fl = null; setBtn(); },
+    seekTo(sec) { if (fl) { t = Math.max(fl.start, Math.min(fl.end, sec)); frame(); } }
+  };
+})();
+RENDER.fleet = () => Fleet.render();
+
+/* =====================================================================
+   Alerts
+   ===================================================================== */
+let alertType = "all";
+RENDER.alerts = async () => {
+  const [a, run] = await Promise.all([api("alerts?limit=500"), api("run")]);
+  const s = run.stats, rows = a.alerts;
+  kpiRow($("#al-kpis"), [
+    { label: "Alerts", value: rows.length, color: "var(--red)", vcolor: rows.length ? "var(--red)" : "var(--ink)", sub: "in this run" },
+    { label: "Cold chain (CC-01)", value: s.cold_chain_alerts, color: "var(--red)", sub: "> 8 °C, 2 readings or 15 min" },
+    { label: "Route deviation (RD-01)", value: s.route_deviation_alerts, color: "var(--amber)", sub: "> 250 m for 60 s" },
+    { label: "Spikes suppressed", value: s.suppressed_spikes, color: "var(--slate)", sub: "single breach, no alert" },
+    { label: "Shipments affected", value: new Set(rows.map(r => r.shipment_id)).size, sub: "one alert per episode", color: "var(--teal)" },
+  ]);
+  const types = ["all", ...new Set(rows.map(r => r.alert_type))];
+  $("#al-type").innerHTML = types.map(t => `<button data-t="${t}" class="${t === alertType ? "on" : ""}">${t === "all" ? "All" : SCEN_LABEL(t.toUpperCase())}</button>`).join("");
+  $("#al-type").querySelectorAll("button").forEach(b => b.onclick = () => { alertType = b.dataset.t; RENDER.alerts(); });
+  const draw = () => {
+    const q = $("#al-q").value.toLowerCase();
+    const data = rows.filter(r => (alertType === "all" || r.alert_type === alertType) && (!q || JSON.stringify(r).toLowerCase().includes(q)));
+    table($("#al-table"), [
+      { key: "severity", label: "Severity", render: r => `<span class="pill ${r.severity === "CRITICAL" ? "p-crit" : "p-warn"}">${r.severity}</span>` },
+      { key: "rule_id", label: "Rule", mono: true },
+      { key: "shipment_id", label: "Shipment", mono: true, render: r => `<b>${r.shipment_id}</b>` },
+      { key: "vehicle_id", label: "Vehicle / sensor", mono: true, render: r => r.vehicle_id || r.sensor_id || "—" },
+      { key: "start_event_time", label: "Started", mono: true, render: r => hhmmss(r.start_event_time) },
+      { key: "max_temperature", label: "Peak", num: true, render: r => r.max_temperature != null ? r.max_temperature + " °C" : r.deviation_metres != null ? fmt(Math.round(r.deviation_metres)) + " m" : "—" },
+      { key: "explanation", label: "Explanation" },
+    ], data, { onClick: r => openShipment(r.shipment_id), sort: "start_event_time", dir: 1 });
+  };
+  $("#al-q").oninput = draw;
+  draw();
+};
+function median(a) { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+
+/* =====================================================================
+   Carriers
+   ===================================================================== */
+const Carriers = { selected: null };
+RENDER.carriers = async () => {
+  const [c, d, otif] = await Promise.all([api("analytics/carrier-detail"), api("analytics/deliveries"), api("analytics/otif")]);
+  const best = c.carriers[0], worst = c.carriers[c.carriers.length - 1];
+  kpiRow($("#ca-kpis"), [
+    { label: "Shipments", value: otif.shipments, sub: `${otif.delivered} delivered in the hour`, color: "var(--sky)" },
+    { label: "OTIF", value: otif.otif_pct, dec: 1, suf: "%", sub: "on time, delivered shipments", color: "var(--teal)" },
+    { label: "Median delay", value: otif.median_delay_min, dec: 1, suf: " min", sub: "negative = early", color: "var(--navy)" },
+    { label: "p95 delay", value: otif.p95_delay_min, dec: 1, suf: " min", sub: "the tail customers notice", color: "var(--amber)" },
+    { label: "Best carrier", value: best?.otif_pct, dec: 1, suf: "%", sub: esc(best?.carrier_name || ""), color: "var(--teal)" },
+    { label: "Weakest carrier", value: worst?.otif_pct, dec: 1, suf: "%", sub: esc(worst?.carrier_name || ""), color: "var(--red)", vcolor: "var(--red)" },
+  ]);
+  const drawAll = () => {
+    const sel = Carriers.selected;
+    barH($("#ca-bar"), c.carriers.map(x => ({ label: x.carrier_name || x.carrier_id, id: x.carrier_id, value: x.otif_pct || 0, active: !sel || sel === x.carrier_id, color: (x.otif_pct || 0) < 60 ? css("--red") : (x.otif_pct || 0) < 80 ? css("--amber") : css("--teal"), tip: `<b>${esc(x.carrier_name)}</b><br>${x.delivered}/${x.shipments} delivered · p95 ${fmt1(x.p95_delay_min)} min` })),
+      { max: 100, labelW: 160, fmt: v => v.toFixed(1) + "%", onClick: x => { Carriers.selected = Carriers.selected === x.id ? null : x.id; drawAll(); } });
+    const ships = d.shipments.filter(s => !sel || s.carrier_id === sel);
+    const name = sel ? c.carriers.find(x => x.carrier_id === sel)?.carrier_name : null;
+    $("#ca-hhint").textContent = sel ? `${name}: ${ships.length} delivered shipments.` : "Actual minus promised arrival, all delivered shipments.";
+    $("#ca-shint").textContent = sel ? `${name}'s delivered shipments. Click one to open it.` : "Delivered shipments. Click one to open it.";
+    const lo = -45, hi = 30, bw = 5, bins = [];
+    for (let x = lo; x < hi; x += bw) bins.push({ x, n: 0 });
+    ships.forEach(s => { const i = Math.max(0, Math.min(bins.length - 1, Math.floor((s.delay_min - lo) / bw))); bins[i].n++; });
+    columns($("#ca-hist"), bins.map(b => ({ label: (b.x >= 0 ? "+" : "") + b.x, value: b.n, color: b.x >= 0 ? css("--red") : css("--teal"), tip: `<b>${b.x} to ${b.x + bw} min</b><br>${b.n} shipments` })), { h: 250, w: 700 });
+    table($("#ca-ship"), [
+      { key: "shipment_id", label: "Shipment", mono: true, render: r => `<b>${r.shipment_id}</b>` },
+      { key: "carrier_name", label: "Carrier" },
+      { key: "temperature_class", label: "Load", render: r => r.temperature_class === "COLD_2_8" ? '<span class="pill p-info">reefer 2–8 °C</span>' : '<span class="pill p-mute">ambient</span>' },
+      { key: "origin", label: "Route", render: r => `${r.origin} → ${r.destination}` },
+      { key: "delay_min", label: "Delay (min)", num: true, render: r => `<b style="color:${r.delay_min > 0 ? "var(--red)" : "var(--teal)"}">${r.delay_min > 0 ? "+" : ""}${fmt1(r.delay_min)}</b>` },
+      { key: "on_time", label: "On time", render: r => r.on_time ? '<span class="pill p-ok">yes</span>' : '<span class="pill p-crit">late</span>' },
+    ], ships, { onClick: r => openShipment(r.shipment_id), sort: "delay_min" });
+  };
+  $("#ca-clear").onclick = () => { Carriers.selected = null; drawAll(); };
+  table($("#ca-table"), [
+    { key: "carrier_name", label: "Carrier", render: r => `<b>${esc(r.carrier_name)}</b> <span class="mono" style="color:var(--mute)">${r.carrier_id}</span>` },
+    { key: "shipments", label: "Shipments", num: true },
+    { key: "delivered", label: "Delivered", num: true },
+    { key: "cold_shipments", label: "Reefer loads", num: true },
+    { key: "otif_pct", label: "OTIF %", num: true, render: r => `<div style="display:flex;align-items:center;gap:8px;justify-content:flex-end"><div style="width:90px;height:7px;background:var(--panel2);border-radius:4px;overflow:hidden"><div style="height:100%;width:${r.otif_pct || 0}%;background:${(r.otif_pct || 0) < 60 ? "var(--red)" : (r.otif_pct || 0) < 80 ? "var(--amber)" : "var(--teal)"}"></div></div><b>${fmt1(r.otif_pct)}</b></div>` },
+    { key: "median_delay_min", label: "Median delay", num: true, render: r => fmt1(r.median_delay_min) },
+    { key: "p95_delay_min", label: "p95 delay", num: true, render: r => fmt1(r.p95_delay_min) },
+  ], c.carriers, { sort: "otif_pct", onClick: r => { Carriers.selected = r.carrier_id; drawAll(); } });
+  drawAll();
+};
+
+/* =====================================================================
+   Data quality
+   ===================================================================== */
+RENDER.quality = async () => {
+  const [l, q, run] = await Promise.all([api("analytics/lateness"), api("quarantine?limit=50"), api("run")]);
+  const valid = run.stats.valid;
+  kpiRow($("#dq-kpis"), [
+    { label: "Published", value: run.published, color: "var(--sky)" },
+    { label: "Quarantined", value: l.quarantined, sub: `${(100 * l.quarantined / run.published).toFixed(2)}% of published`, color: "var(--red)", vcolor: "var(--red)" },
+    { label: "Duplicates removed", value: l.duplicates, color: "var(--slate)" },
+    { label: "Late, tolerated", value: l.late_tolerated, sub: "within 5 min lateness", color: "var(--amber)" },
+    { label: "Late side output", value: l.late_side_output, sub: "kept, not dropped", color: "var(--amber)" },
+    { label: "Data accepted", value: 100 * valid / run.published, dec: 2, suf: "%", sub: "valid / published", color: "var(--teal)" },
+  ]);
+  const pal = [css("--red"), css("--amber"), css("--violet"), css("--sky"), css("--slate")];
+  const reasons = Object.entries(l.by_reason).sort((a, b) => b[1] - a[1]);
+  if (reasons.length) donut($("#dq-donut"), reasons.map(([k, v], i) => ({ label: k, value: v, color: pal[i % pal.length] })), { label: "quarantined" });
+  else $("#dq-donut").innerHTML = '<div class="empty">Nothing quarantined.</div>';
+  barH($("#dq-late"), [
+    { label: "On time", value: l.on_time, color: css("--teal") },
+    { label: "Late, tolerated", value: l.late_tolerated, color: css("--amber") },
+    { label: "Late side output", value: l.late_side_output, color: css("--red") },
+    { label: "Duplicates", value: l.duplicates, color: "#9aa7b4" },
+    { label: "Quarantined", value: l.quarantined, color: css("--red") },
+  ], { labelW: 140, fmt: v => fmt(v), max: run.published });
+  $("#dq-rules").innerHTML = `<div class="legend"><span class="chip">watermark 60 s</span><span class="chip">allowed lateness 5 min</span><span class="chip">dedup on event_id, 1 h window</span><span class="chip">structural checks, then domain checks</span><span class="chip">every rejection keeps its reason + raw payload</span></div>`;
+  table($("#dq-table"), [
+    { key: "event_id", label: "Event", mono: true, render: r => r.event_id.slice(0, 8) + "…" },
+    { key: "event_type", label: "Type" },
+    { key: "reason_codes", label: "Reason", render: r => r.reason_codes.map(c => `<span class="pill p-crit">${c}</span>`).join(" ") },
+    { key: "observed", label: "Observed", mono: true, render: r => r.reasons.map(e => `${e.field}=${esc(e.observed)}`).join(", ") },
+    { key: "expected", label: "Expected", mono: true, render: r => r.reasons.map(e => esc(e.expected)).join(", ") },
+    { key: "src", label: "Entity", mono: true, render: r => r.raw_payload.vehicle_id || r.raw_payload.sensor_id || "—" },
+  ], q.records, { onClick: r => openPayload(r) });
+};
+function openPayload(r) {
+  const d = $("#drawer");
+  d.innerHTML = `<div class="head" style="display:flex;align-items:center;gap:10px"><div><div class="crumb" style="color:var(--mute);font-size:12px">Quarantined record</div><h2 style="margin:2px 0">${r.reason_codes.join(", ")}</h2></div><div style="flex:1"></div><button class="ibtn" onclick="closeDrawer()">✕</button></div>
+  <div class="card" style="margin-top:12px"><h3>Why it was rejected</h3>${r.reasons.map(e => `<div class="stat-row"><span><b>${e.rule_id}</b> · ${e.field}</span><span>observed <b>${esc(e.observed)}</b>, expected ${esc(e.expected)}</span></div>`).join("")}</div>
+  <div class="card" style="margin-top:12px"><h3>Payload exactly as it arrived</h3><pre class="json" style="max-height:none">${prettyJson(r.raw_payload)}</pre></div>`;
+  openDrawer();
+}
+
+/* =====================================================================
+   Models
+   ===================================================================== */
+RENDER.models = async () => {
+  let rep;
+  try { rep = await api("ml/report"); } catch (e) { $("#ml-kpis").innerHTML = `<div class="card empty" style="grid-column:1/-1">Models not trained yet. Run <span class="mono">make history && make ml</span>.</div>`; return; }
+  const [hist, fc, risk] = await Promise.all([api("history/summary").catch(() => null), api("ml/forecast-hourly"), api("ml/delay-risk?limit=25")]);
+  const gbt = rep.delay.models.find(m => m.model === "gbt"), st = rep.delay.models.find(m => m.model === "static_eta");
+  const drift = rep.trip_anomaly.by_category.find(c => c.category.startsWith("drift"));
+  const par = rep.online_parity;
+  kpiRow($("#ml-kpis"), [
+    { label: "History", value: hist ? hist.published : null, sub: hist ? `events · ${hist.gold?.fact_delivery_performance || "—"} shipments · OTIF ${hist.kpis?.delivery?.otif_pct ?? "—"}%` : "35 days", color: "var(--sky)" },
+    { label: "Delay error (model)", value: gbt.mae_min, dec: 2, suf: " min", sub: `static ETA ${st.mae_min} min`, color: "var(--teal)", vcolor: "var(--teal)" },
+    { label: "Late-delivery AUC", value: gbt.auc, dec: 3, sub: `static ETA ${st.auc}`, color: "var(--navy)" },
+    { label: "Drifting reefers found", value: drift.model_flagged, sub: `of ${drift.trips} · the 8 °C rule found ${drift.rule_flagged}`, color: "var(--red)", vcolor: "var(--red)" },
+    { label: "Online = batch", value: 100 * par.identical_features / par.compared_with_batch, dec: 2, suf: "%", sub: `${fmt(par.identical_features)} of ${fmt(par.compared_with_batch)} dispatches`, color: "var(--teal)" },
+  ]);
+  const names = { promise: "Promised time", static_eta: "Static ETA", carrier_hour_mean: "Carrier-hour mean", linear: "Linear", gbt: "Gradient boosting" };
+  barH($("#ml-mae"), rep.delay.models.slice().sort((a, b) => b.mae_min - a.mae_min).map(m => ({ label: names[m.model] || m.model, value: m.mae_min, color: m.model === "gbt" ? css("--teal") : css("--slate"), tip: `<b>${names[m.model] || m.model}</b><br>MAE ${m.mae_min} · RMSE ${m.rmse_min} · AUC ${m.auc}` })), { labelW: 150, fmt: v => v.toFixed(2) + " min" });
+  const pd = rep.delay.per_day;
+  lineChart($("#ml-daily"), [{ color: css("--teal"), points: pd.map((d, i) => ({ x: i, y: d.gbt_mae_min, tip: `<b>${d.day}</b><br>MAE ${d.gbt_mae_min} min · ${d.test_rows} shipments, ${d.late} late` })) }], { h: 240, xfmt: v => (pd[Math.round(v)]?.day || "").slice(5), xticks: Math.min(6, pd.length - 1), ymin: 0, yfmt: v => v.toFixed(0) });
+  barH($("#ml-imp"), rep.delay.importance.slice(0, 7).map(f => ({ label: f.feature, value: f.auc_drop, color: css("--navy") })), { labelW: 170, fmt: v => v.toFixed(3) });
+  table($("#ml-trip"), [
+    { key: "category", label: "Trip category", render: r => `<b>${esc(r.category)}</b>` },
+    { key: "trips", label: "Trips", num: true },
+    { key: "rule_flagged", label: "8 °C rule", num: true },
+    { key: "model_flagged", label: "Isolation forest", num: true, render: r => `<b style="color:${r.category.startsWith("normal") ? (r.model_flagged ? "var(--red)" : "var(--teal)") : "var(--teal)"}">${r.model_flagged}</b>` },
+  ], rep.trip_anomaly.by_category);
+  const whs = Object.keys(fc.warehouses), pal = [css("--teal"), css("--sky"), css("--amber"), css("--violet"), css("--red")];
+  const on = new Set(whs);
+  const drawFc = () => {
+    lineChart($("#ml-fc"), whs.filter(w => on.has(w)).map((w, i) => ({ color: pal[whs.indexOf(w) % pal.length], points: fc.warehouses[w].map((p, j) => ({ x: j, y: p.orders, tip: `<b>${w}</b> ${p.hour}<br>${p.orders} orders` })) })), { h: 250, w: 760, ymin: 0, xfmt: v => fc.warehouses[whs[0]][Math.round(v)]?.hour || "", xticks: 6, yfmt: v => v.toFixed(1) });
+    $("#ml-fc-leg").innerHTML = whs.map((w, i) => `<span data-w="${w}" style="opacity:${on.has(w) ? 1 : .35}"><i style="background:${pal[i % pal.length]}"></i>${w} · ${fc.warehouses[w].reduce((a, p) => a + p.orders, 0).toFixed(1)}</span>`).join("");
+    $("#ml-fc-leg").querySelectorAll("[data-w]").forEach(n => n.onclick = () => { const w = n.dataset.w; on.has(w) ? on.delete(w) : on.add(w); if (!on.size) on.add(w); drawFc(); });
+  };
+  drawFc();
+  table($("#ml-risk"), [
+    { key: "shipment_id", label: "Shipment", mono: true },
+    { key: "carrier_id", label: "Carrier", mono: true },
+    { key: "p_late", label: "P(late)", num: true, render: r => `<div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="width:60px;height:7px;background:var(--panel2);border-radius:4px;overflow:hidden"><div style="height:100%;width:${100 * r.p_late}%;background:${r.p_late >= .5 ? "var(--red)" : "var(--teal)"}"></div></div>${r.p_late.toFixed(2)}</div>` },
+    { key: "predicted_delay_min", label: "Predicted", num: true, render: r => fmt1(r.predicted_delay_min) },
+    { key: "actual_delay_min", label: "Actual", num: true, render: r => fmt1(r.actual_delay_min) },
+  ], risk.shipments, { sort: "p_late" });
+};
+
+/* =====================================================================
+   Scenarios
+   ===================================================================== */
+RENDER.scenarios = async () => {
+  const r = await api("runs", { cache: false });
+  const rows = r.runs.map(x => ({ ...x, ...x.stats, otif: x.kpis.otif_pct, label: SCEN_LABEL(x.scenario) }));
+  const maxOf = k => Math.max(1, ...rows.map(x => x[k] || 0));
+  const bar = (k, color) => x => `<div style="display:flex;align-items:center;gap:8px;justify-content:flex-end"><div style="width:70px;height:7px;background:var(--panel2);border-radius:4px;overflow:hidden"><div style="height:100%;width:${100 * (x[k] || 0) / maxOf(k)}%;background:${color}"></div></div><b style="min-width:42px;display:inline-block">${fmt(x[k])}</b></div>`;
+  table($("#sc-table"), [
+    { key: "label", label: "Scenario", render: x => `<b>${x.label}</b>${x.run === state.run ? ' <span class="pill p-ok">open</span>' : ""}` },
+    { key: "valid", label: "Valid", num: true, render: bar("valid", "var(--teal)") },
+    { key: "quarantined", label: "Quarantined", num: true, render: bar("quarantined", "var(--red)") },
+    { key: "duplicates", label: "Duplicates", num: true, render: bar("duplicates", "#9aa7b4") },
+    { key: "late_within_tolerance", label: "Late, tolerated", num: true, render: bar("late_within_tolerance", "var(--amber)") },
+    { key: "late_side_output", label: "Late side output", num: true, render: bar("late_side_output", "var(--amber)") },
+    { key: "cold_chain_alerts", label: "Cold-chain alerts", num: true, render: bar("cold_chain_alerts", "var(--red)") },
+    { key: "route_deviation_alerts", label: "Deviation alerts", num: true, render: bar("route_deviation_alerts", "var(--amber)") },
+    { key: "otif", label: "OTIF %", num: true, render: x => fmt1(x.otif) },
+  ], rows, { onClick: x => { state.run = x.run; $("#runsel").value = x.run; $("#runsel").onchange({ target: { value: x.run } }); go("overview"); } });
+  const short = x => x.label.replace("Warehouse ", "").replace(" Delivery", "").replace(" Event", "").replace(" Excursion", "");
+  columns($("#sc-chart"), rows.map(x => ({ label: short(x), value: (x.duplicates || 0) + (x.late_side_output || 0) + (x.late_within_tolerance || 0) + (x.cold_chain_alerts || 0) + (x.route_deviation_alerts || 0), color: x.duplicates ? "#9aa7b4" : (x.late_side_output || x.late_within_tolerance) ? css("--amber") : (x.cold_chain_alerts || x.route_deviation_alerts) ? css("--red") : css("--slate"), tip: `<b>${x.label}</b><br>duplicates ${fmt(x.duplicates)}<br>late tolerated ${fmt(x.late_within_tolerance)}, side output ${fmt(x.late_side_output)}<br>alerts ${x.cold_chain_alerts + x.route_deviation_alerts}` })), { h: 250, w: 640 });
+  columns($("#sc-chart2"), rows.map(x => ({ label: short(x), value: x.otif || 0, color: css("--teal"), tip: `<b>${x.label}</b><br>OTIF ${fmt1(x.otif)}%<br>quarantined ${fmt(x.quarantined)}` })), { h: 250, w: 640 });
+};
+
+/* =====================================================================
+   Shipment drawer
+   ===================================================================== */
+function openDrawer() { $("#drawer").classList.add("on"); $("#scrim").classList.add("on"); }
+function closeDrawer() { $("#drawer").classList.remove("on"); $("#scrim").classList.remove("on"); }
+$("#scrim").onclick = closeDrawer;
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawer(); });
+async function openShipment(id) {
+  const d = $("#drawer");
+  d.innerHTML = '<div class="empty">Loading…</div>'; openDrawer();
+  let s;
+  try { s = await api("shipments/" + encodeURIComponent(id)); } catch (e) { d.innerHTML = `<div class="empty">${esc(e)}</div>`; return; }
+  const cold = s.temperature_class === "COLD_2_8";
+  d.innerHTML = `<div style="display:flex;align-items:center;gap:10px"><div><div style="color:var(--mute);font-size:12px">Shipment · ${esc(s.carrier_name)} · ${s.vehicle_id}</div><h2 style="margin:2px 0;font-size:22px">${s.shipment_id} ${cold ? '<span class="pill p-info">reefer 2–8 °C</span>' : '<span class="pill p-mute">ambient</span>'} ${s.alerts.length ? `<span class="pill p-crit">${s.alerts.length} alert${s.alerts.length > 1 ? "s" : ""}</span>` : ""}</h2></div><div style="flex:1"></div><button class="btn" id="dr-map">Show on fleet map</button><button class="ibtn" onclick="closeDrawer()">✕</button></div>
+  <div class="facts">
+    <div><div class="l">Route</div><div class="v">${s.origin || "—"} → ${s.destination || "—"}</div></div>
+    <div><div class="l">Promised</div><div class="v mono">${hhmmss(s.promised_delivery_time)}</div></div>
+    <div><div class="l">Delivered</div><div class="v mono">${s.delivered_at ? hhmmss(s.delivered_at) : "in transit"}</div></div>
+    <div><div class="l">Delay</div><div class="v" style="color:${s.delay_min > 0 ? "var(--red)" : "var(--teal)"}">${s.delay_min != null ? (s.delay_min > 0 ? "+" : "") + s.delay_min + " min" : "—"}</div></div>
+  </div>
+  <div class="card"><h3>Lifecycle</h3><p class="hint">Append-only status history, forward-only in event time.</p><div class="timeline">${s.timeline.map(x => `<div><b>${x.status}</b><span>${hhmmss(x.event_time)}</span></div>`).join("")}</div></div>
+  ${s.alerts.map(a => `<div class="card" style="margin-top:12px;border-left:4px solid ${a.severity === "CRITICAL" ? "var(--red)" : "var(--amber)"}"><div style="display:flex;gap:8px;align-items:center"><span class="pill ${a.severity === "CRITICAL" ? "p-crit" : "p-warn"}">${a.severity}</span><b>${a.rule_id}</b><span class="mono" style="color:var(--mute)">${esc(a.alert_id)}</span></div><div style="margin-top:6px">${esc(a.explanation)}</div><div style="color:var(--mute);font-size:12px;margin-top:4px">started ${hhmmss(a.start_event_time)} · triggered by event <span class="mono">${esc((a.trigger_event_id || "").slice(0, 8))}…</span></div></div>`).join("")}
+  ${s.readings.length ? '<div class="card" style="margin-top:12px"><h3>Reefer temperature</h3><p class="hint">Every reading from Silver. Red dots are above 8 °C.</p><div id="dr-temp"></div></div>' : ""}
+  <div class="card" style="margin-top:12px"><h3>Track against the planned route</h3><p class="hint">Grey: the route corridor. Line: GPS fixes from Silver.</p><div id="dr-map-svg"></div></div>`;
+  $("#dr-map").onclick = () => { closeDrawer(); go("fleet"); setTimeout(() => { const t = s.track.length ? Date.parse(s.dispatched_at?.replace(" ", "T") + "Z") / 1000 + 60 : null; if (t) Fleet.seekTo(t); }, 400); };
+  if (s.readings.length) {
+    const ccStart = s.alerts.find(a => a.alert_type === "cold_chain");
+    lineChart($("#dr-temp"), [{ color: css("--sensor"), points: s.readings.map(r => ({ x: Date.parse(r.t.replace(" ", "T") + "Z") / 1000, y: r.temperature_c, color: r.temperature_c > 8 ? css("--red") : null, r: r.temperature_c > 8 ? 4 : 2.6, tip: `<b>${r.t.slice(11, 19)}</b><br>${r.temperature_c} °C · humidity ${r.humidity_pct}%` })) }],
+      { h: 230, w: 660, thresholds: [{ y: 8, label: "8 °C limit", color: css("--red") }, { y: 2, label: "2 °C", color: css("--sky") }], bands: [{ from: 2, to: 8, color: css("--teal") }], markers: ccStart ? [{ x: Date.parse(ccStart.trigger_event_time) / 1000, label: "alert", color: css("--red") }] : [], xfmt: v => new Date(v * 1000).toISOString().slice(11, 16), yfmt: v => v.toFixed(0) + "°" });
+  }
+  const net = await api("network");
+  const box = $("#dr-map-svg"), w = 660, h = 300, s2 = svg(box, w, h);
+  const nodes = net.nodes.filter(n => s.route_nodes.includes(n.id));
+  const pts = s.track.map(p => ({ lat: p[1], lon: p[2] })).concat(nodes);
+  if (pts.length) {
+    const la0 = Math.min(...pts.map(p => p.lat)), la1 = Math.max(...pts.map(p => p.lat)), lo0 = Math.min(...pts.map(p => p.lon)), lo1 = Math.max(...pts.map(p => p.lon)), k = Math.cos(la0 * Math.PI / 180);
+    const sc = Math.min((w - 60) / Math.max(1e-6, (lo1 - lo0) * k), (h - 50) / Math.max(1e-6, la1 - la0));
+    const P = (lat, lon) => [30 + (lon - lo0) * k * sc, 25 + (la1 - lat) * sc];
+    const rp = s.route_nodes.map(id => net.nodes.find(n => n.id === id)).filter(Boolean).map(n => P(n.lat, n.lon));
+    el("path", { d: "M" + rp.map(p => p.join(",")).join("L"), stroke: css("--slate"), "stroke-width": 16, opacity: .2, fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" }, s2);
+    el("path", { d: "M" + rp.map(p => p.join(",")).join("L"), stroke: css("--slate"), "stroke-width": 1.5, "stroke-dasharray": "4 5", fill: "none" }, s2);
+    s.route_nodes.forEach((id, i) => { const [x, y] = rp[i]; el("circle", { cx: x, cy: y, r: 4, fill: css("--slate") }, s2); el("text", { x: x + 6, y: y - 6 }, s2).textContent = id.replace(/_/g, " "); });
+    if (s.track.length) {
+      const tp = s.track.map(p => P(p[1], p[2]));
+      const path = el("path", { d: "M" + tp.map(p => p.join(",")).join("L"), stroke: s.alerts.some(a => a.alert_type === "route_deviation") ? css("--amber") : css("--teal"), "stroke-width": 3, fill: "none", "stroke-linejoin": "round" }, s2);
+      const L = path.getTotalLength(); path.style.strokeDasharray = L; path.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 1400, fill: "forwards" });
+      el("circle", { cx: tp[0][0], cy: tp[0][1], r: 6, fill: css("--teal") }, s2);
+      el("circle", { cx: tp[tp.length - 1][0], cy: tp[tp.length - 1][1], r: 6, fill: css("--navy") }, s2);
+      s.alerts.filter(a => a.observed_latitude).forEach(a => { const [x, y] = P(a.observed_latitude, a.observed_longitude); el("circle", { cx: x, cy: y, r: 9, fill: "none", stroke: css("--red"), "stroke-width": 3 }, s2); el("text", { x: x + 12, y: y + 4, style: `fill:${css("--red")};font-weight:700` }, s2).textContent = `${Math.round(a.deviation_metres)} m off route`; });
+    }
   }
 }
 
-async function loadModels() {
-  const none = 'Run "make history" and "make ml", then refresh.';
-  try {
-    const h = await api('/api/v1/history/summary');
-    const m = await api('/api/v1/ml/report');
-    const d = h.kpis.delivery;
-    document.getElementById('hist-lede').textContent =
-      `${h.published.toLocaleString()} events over ${h.gold.dim_date} days, ${d.shipments.toLocaleString()} shipments, OTIF ${d.otif_pct}%.`;
-    const by = name => m.delay.models.find(x => x.model === name);
-    const gbt = by('gbt'), eta = by('static_eta');
-    const drift = m.trip_anomaly.by_category[0];
-    const best = m.demand_forecast.models.find(x => x.model === 'gbt_poisson');
-    const parity = m.online_parity || {};
-    document.getElementById('ml-tiles').innerHTML = [
-      tile(`${gbt.mae_min} min`, 'delay error, model', `STATIC ETA ${eta.mae_min} MIN`, true),
-      tile(gbt.auc, 'late-delivery AUC', `STATIC ETA ${eta.auc}`),
-      tile(`${drift.model_flagged}/${drift.trips}`, 'drifting reefers found', `RULE FOUND ${drift.rule_flagged}`, true),
-      tile(best.hourly_wape, 'hourly demand WAPE', 'DAY-AHEAD, ALL WAREHOUSES'),
-      tile(parity.identical_features !== undefined ? `${parity.identical_features}/${parity.compared_with_batch}` : '-',
-           'online = batch features', 'TRAINING/SERVING PARITY')
-    ].join('');
-
-    const r = await api('/api/v1/ml/delay-risk');
-    document.getElementById('risk').innerHTML =
-      `<table><tr><th>SHIPMENT</th><th>CARRIER</th><th>FROM</th><th>P(LATE)</th><th>PREDICTED</th><th>ACTUAL</th></tr>` +
-      r.shipments.map(x => `<tr><td class="mono">${x.shipment_id}</td><td class="mono">${x.carrier_id}</td>
-        <td class="mono">${x.origin_warehouse_id}</td><td class="${x.p_late >= 0.5 ? 'acc' : ''}">${x.p_late.toFixed(2)}</td>
-        <td>${x.predicted_delay_min.toFixed(1)} min</td><td>${x.actual_delay_min.toFixed(1)} min</td></tr>`).join('') + '</table>';
-
-    document.getElementById('trips').innerHTML =
-      `<table><tr><th>TRIP TYPE (TEST WINDOW)</th><th>TRIPS</th><th>FLAGGED BY RULE</th><th>FLAGGED BY MODEL</th></tr>` +
-      m.trip_anomaly.by_category.map(x => `<tr><td>${x.category}</td><td>${x.trips}</td>
-        <td>${x.rule_flagged}</td><td>${x.model_flagged}</td></tr>`).join('') + '</table>';
-
-    const f = await api('/api/v1/ml/forecast');
-    document.getElementById('forecast').innerHTML =
-      `<table><tr><th>WAREHOUSE</th><th>FORECAST ORDERS</th><th>BUSIEST HOUR</th></tr>` +
-      f.warehouses.map(x => `<tr><td class="mono">${x.warehouse_id}</td><td>${x.orders}</td>
-        <td class="mono">${String(x.busiest_hour).slice(11, 16)}</td></tr>`).join('') + '</table>';
-  } catch (err) {
-    document.getElementById('hist-lede').textContent = none;
-    ['risk', 'trips', 'forecast'].forEach(id =>
-      document.getElementById(id).innerHTML = `<p class="empty">${none}</p>`);
-  }
-}
-load();
-loadModels();
+/* =====================================================================
+   Boot
+   ===================================================================== */
+(async () => {
+  await health(); setInterval(health, 15000);
+  try { await loadRuns(); } catch (e) { $("#content").innerHTML = `<div class="card" style="max-width:640px;margin:40px auto"><h3>No run found</h3><p>Run <span class="mono">make demo</span> (or <span class="mono">make scenarios</span>) and reload this page.</p><p class="mono" style="color:var(--mute)">${esc(e)}</p></div>`; return; }
+  Live.init();
+  const start = (location.hash || "#overview").slice(1);
+  go(PAGES.find(p => p[0] === start) ? start : "overview");
+  addEventListener("hashchange", () => { const h = location.hash.slice(1); if (h !== state.page && PAGES.find(p => p[0] === h)) go(h); });
+})();
 </script>
 </body>
 </html>

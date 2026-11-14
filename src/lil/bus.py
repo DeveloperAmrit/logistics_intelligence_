@@ -12,6 +12,8 @@ Producers publish to this, never to the database or the dashboard.
 """
 from __future__ import annotations
 
+import time
+
 import json
 import threading
 from collections import defaultdict
@@ -128,21 +130,54 @@ class KafkaBus(Bus):
         self._producer.produce(topic, key=event.key().encode(), value=event.to_json().encode())
         self._producer.poll(0)
 
-    def consume(self, topic: str, group: str = "default", from_offset: int = 0) -> Iterator[Event]:
+    def consume(self, topic: str, group: str = "default", from_offset: int = 0,
+                start_timeout: float = 30.0, idle_timeout: float = 5.0) -> Iterator[Event]:
+        """Read what the topic holds now, then stop.
+
+        A one-pass read ends when every assigned partition has reported its end
+        (partition EOF). Before the first assignment it waits up to
+        `start_timeout`: on a fresh broker the group coordinator is still being
+        created, and giving up after one empty poll used to skip a whole topic.
+        `idle_timeout` is only a safety net if EOF never arrives.
+        """
+        from confluent_kafka import KafkaError  # type: ignore
+
         consumer = self._Consumer({
             "bootstrap.servers": self.bootstrap_servers,
             "group.id": f"{self.group_id}.{group}",
             "auto.offset.reset": "earliest" if from_offset == 0 else "latest",
             "enable.auto.commit": True,
+            "enable.partition.eof": True,
         })
-        consumer.subscribe([topic])
+        assigned: set[int] = set()
+        at_end: set[int] = set()
+
+        def on_assign(_consumer, partitions):
+            assigned.update(p.partition for p in partitions)
+
+        consumer.subscribe([topic], on_assign=on_assign)
+        started = time.monotonic()
+        last_seen = None
         try:
             while True:
-                message = consumer.poll(1.0)
+                message = consumer.poll(0.5)
+                now = time.monotonic()
                 if message is None:
-                    break
-                if message.error():
+                    if last_seen is None and not assigned and now - started > start_timeout:
+                        break
+                    if (last_seen or started) and assigned and at_end >= assigned:
+                        break
+                    if last_seen is not None and now - last_seen > idle_timeout:
+                        break
                     continue
+                if message.error():
+                    if message.error().code() == KafkaError._PARTITION_EOF:
+                        at_end.add(message.partition())
+                        if assigned and at_end >= assigned:
+                            break
+                    continue
+                at_end.discard(message.partition())
+                last_seen = now
                 yield Event.from_json(message.value().decode())
         finally:
             consumer.close()

@@ -37,6 +37,26 @@ def test_run_endpoints(client):
     assert alerts["count"] == run["stats"]["route_deviation_alerts"] > 0
     assert client.get("/api/v1/analytics/otif").status_code == 200
 
+    # the views behind the dashboard, all scoped to one run
+    runs = client.get("/api/v1/runs").json()
+    assert runs["latest"] == "route_deviation"
+    assert client.get("/api/v1/run?run=route_deviation").json()["scenario"] == "ROUTE_DEVIATION"
+    assert client.get("/api/v1/run?run=../../etc").status_code == 404
+    minutes = client.get("/api/v1/analytics/throughput").json()["minutes"]
+    assert sum(m["gps"] for m in minutes) > 0
+    assert client.get("/api/v1/fleet?step=60").json()["vehicles"]
+    network = client.get("/api/v1/network").json()
+    assert len(network["nodes"]) == 12 and len(network["warehouses"]) == 5
+    detail = client.get("/api/v1/shipments/ship-0001").json()
+    assert detail["timeline"] and detail["route_nodes"]
+    assert client.get("/api/v1/shipments/nope").status_code == 404
+
+    # the live view replays the run through the real pipeline and must reach its counts
+    trace = client.get("/api/v1/stream/trace?limit=3000").json()
+    assert trace["total_events"] == run["published"]
+    alert = next(r for r in trace["window"] if "alert" in r)
+    assert alert["outcome"] == "on_time" and alert["alert"]["rule_id"] == "RD-01"
+
 
 def test_timeline_is_parameterised(client):
     assert client.get("/api/v1/shipments/ship-0001/timeline").status_code == 200
@@ -49,3 +69,4 @@ def test_model_endpoints(client):
     assert len(client.get("/api/v1/ml/forecast").json()["warehouses"]) == 5
     assert client.get("/api/v1/ml/delay-risk?limit=5").json()["shipments"]
     assert "delay_gbt" in client.get("/api/v1/models").json()
+

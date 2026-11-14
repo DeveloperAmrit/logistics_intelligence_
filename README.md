@@ -89,6 +89,24 @@ make api            # dashboard and API on http://127.0.0.1:8000
 make demo SCENARIO=ROUTE_DEVIATION SEED=7
 ```
 
+## The dashboard
+
+`make api` serves the API and an operations dashboard on http://127.0.0.1:8000.
+It has no external dependencies (hand-written SVG charts), so it works offline.
+
+| Page | What it shows |
+|---|---|
+| Overview | run KPIs, events per minute by stream, the processing funnel, OTIF by carrier, latest alerts |
+| Live stream | the run's own Kafka topics replayed event by event through a fresh copy of the pipeline (`api/trace.py`); each dot's route shows what validate, dedup, event time and detect decided, and notable events pause the stream and are explained step by step |
+| Fleet map | every vehicle's GPS track on the Jodhpur network, replayed against event time, with alerts as they fire |
+| Alerts | every alert with its explanation; a click opens the shipment: lifecycle, temperature trace, track against the route corridor |
+| Carriers & delivery | carrier scorecard, delay distribution, shipments |
+| Data quality | quarantine reasons, lateness and duplicates, raw rejected payloads |
+| Models | the 35-day history results: delay error by model, drivers, reefer anomalies, demand forecast, delay risk |
+| Scenarios | all seven fault runs side by side; the scenario picker in the header switches every page |
+
+Run `make scenarios` first so that all seven runs are there to switch between.
+
 ## Five weeks of history and the models
 
 ```bash
@@ -196,6 +214,8 @@ src/lil/
   stream.py            long-running Kafka consumer with checkpoints
   bench.py             latency, capacity and recovery on the broker
   api/app.py           FastAPI serving layer over Gold and the model outputs
+  api/insights.py      read-only queries behind the dashboard charts
+  api/trace.py         replays a run through the pipeline for the live view
   runner.py            one end-to-end run, used by the demo and the tests
 db/migrations/         PostgreSQL schema: master data, append-only history,
                        alerts, quarantine, late events, run provenance
